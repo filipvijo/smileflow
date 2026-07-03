@@ -118,7 +118,27 @@ export default function LuxuryLanding() {
             </motion.div>
           </div>
 
-          <div className="col-span-12 lg:col-span-3 pb-0 md:pb-4 mt-4 md:mt-0">
+          <div className="col-span-12 lg:col-span-3 pb-0 md:pb-4 mt-4 md:mt-0 space-y-6 md:space-y-8">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, rotate: -4 }}
+              animate={{ opacity: 1, scale: 1, rotate: -3 }}
+              transition={{ duration: 0.9, delay: 0.3 }}
+              className="lg:hidden w-32 sm:w-40 mx-auto"
+            >
+              <div className="p-2 rounded-[1.5rem] bg-gradient-to-br from-[#D4AF37] to-[#C5A038] shadow-[0_16px_32px_-8px_rgba(0,0,0,0.6)]">
+                <div className="rounded-[1.15rem] overflow-hidden border-4 border-[#0D1B2A]">
+                  <Image
+                    src="/images/hero-smile.png"
+                    alt="Real patient smile analyzed by SmileFlow"
+                    width={400}
+                    height={460}
+                    className="w-full h-auto object-cover"
+                    priority
+                  />
+                </div>
+              </div>
+            </motion.div>
+
             <div className="flex flex-col gap-4 md:gap-6">
               <a href={mailto("SmileFlow — install on my clinic website")} className="luxury-button">Get It On Your Site</a>
               <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#C5A038] text-center lg:text-left">
@@ -137,15 +157,15 @@ export default function LuxuryLanding() {
             rotate: { duration: 1, delay: 0.6 },
             y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1.6 },
           }}
-          className="hidden lg:block absolute top-28 right-12 xl:right-24 w-48 xl:w-56"
+          className="hidden lg:block absolute top-24 right-10 xl:right-20 w-72 xl:w-80"
         >
-          <div className="p-2 rounded-[1.75rem] bg-gradient-to-br from-[#D4AF37] to-[#C5A038] shadow-[0_24px_48px_-12px_rgba(0,0,0,0.6)]">
-            <div className="rounded-[1.5rem] overflow-hidden border-4 border-[#0D1B2A]">
+          <div className="p-2.5 rounded-[2rem] bg-gradient-to-br from-[#D4AF37] to-[#C5A038] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)]">
+            <div className="rounded-[1.75rem] overflow-hidden border-4 border-[#0D1B2A]">
               <Image
                 src="/images/hero-smile.png"
                 alt="Real patient smile analyzed by SmileFlow"
-                width={400}
-                height={460}
+                width={500}
+                height={575}
                 className="w-full h-auto object-cover"
                 priority
               />
@@ -210,7 +230,7 @@ export default function LuxuryLanding() {
         <div className="max-w-7xl mx-auto">
           <motion.div {...revealProps} className="flex flex-col md:flex-row md:justify-between md:items-end mb-16 md:mb-32 border-b border-white/10 pb-8 md:pb-12 gap-4">
             <h2 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase">The Math</h2>
-            <p className="text-sm font-bold opacity-30 max-w-xs text-right">
+            <p className="text-sm font-bold opacity-30 max-w-md text-left md:text-right">
               You already pay for traffic. SmileFlow converts it.
             </p>
           </motion.div>
@@ -253,8 +273,15 @@ export default function LuxuryLanding() {
       </section>
 
       {/* How it works */}
-      <section className="py-24 md:py-48 px-6 md:px-12 border-t border-white/5">
-        <div className="max-w-7xl mx-auto space-y-16 md:space-y-24">
+      <section className="relative py-24 md:py-48 px-6 md:px-12 border-t border-white/5 overflow-hidden">
+        <Image
+          src="/images/before-after-art.png"
+          alt=""
+          fill
+          aria-hidden="true"
+          className="object-cover object-right opacity-[0.06] mix-blend-luminosity pointer-events-none select-none"
+        />
+        <div className="relative z-10 max-w-7xl mx-auto space-y-16 md:space-y-24">
           <motion.div {...revealProps} className="space-y-4 md:space-y-6">
             <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#C5A038]">Phase 02 — Installation</h3>
             <h2 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase">One line. Any website.</h2>
@@ -276,7 +303,6 @@ export default function LuxuryLanding() {
               <div className="space-y-4">
                 {[
                   "Instant lead notifications to your inbox",
-                  "English and Serbian today — French, German, Spanish next",
                   "Photos analyzed in real time, never stored",
                   "GDPR-conscious consent built into the flow",
                 ].map((item, i) => (
