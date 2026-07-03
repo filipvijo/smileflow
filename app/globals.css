@@ -44,6 +44,11 @@
 
   .luxury-button:hover {
     transform: scale(1.05);
+    box-shadow: 0 16px 40px -12px rgba(212, 175, 55, 0.45);
+  }
+
+  .luxury-button:active {
+    transform: scale(0.98);
   }
 
   .luxury-button-outline {
@@ -67,6 +72,11 @@
   .luxury-button-outline:hover {
     background-color: white;
     color: black;
+    transform: scale(1.03);
+  }
+
+  .luxury-button-outline:active {
+    transform: scale(0.98);
   }
 
   .glass-panel {
