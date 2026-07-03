@@ -1,83 +1,109 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { apiStrings, promptLanguageInstruction, resolveLang } from "@/lib/i18n";
+import { getClinic } from "@/lib/clinics";
+import { checkRateLimit, getClientIp, IP_ANALYZE_RULE, CLINIC_DAY_WINDOW_MS } from "@/lib/rateLimit";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 const AnalysisSchema = z.object({
-  utisak: z.string().min(10),
-  oblasti: z.array(z.string()).max(4),
-  tretmani: z.array(
-    z.object({
-      naziv: z.string(),
-      razlog: z.string(),
-      cena_okvirna: z.string().optional(),
-    })
-  ).max(4),
-  hitnost: z.enum(["niska", "srednja", "visoka"]),
-  poruka: z.string(),
+  impression: z.string().min(10),
+  areas: z.array(z.string()).max(4),
+  treatments: z
+    .array(
+      z.object({
+        name: z.string(),
+        reason: z.string(),
+      })
+    )
+    .max(4),
+  urgency: z.enum(["low", "medium", "high"]),
+  message: z.string(),
 });
 
 export async function POST(req: NextRequest) {
-  try {
-    const formData = await req.formData();
-    const file = formData.get("photo") as File | null;
-    const clinicName = (formData.get("clinicName") as string) || "Vaša Klinika";
+  const formData = await req.formData().catch(() => null);
+  const lang = resolveLang(formData?.get("lang") as string | null);
+  const t = apiStrings[lang];
 
-    if (!file) {
-      return NextResponse.json({ error: "Molimo pošaljite fotografiju osmeha." }, { status: 400 });
+  try {
+    if (!formData) {
+      return NextResponse.json({ error: t.analysisError }, { status: 400 });
     }
 
+    const clinic = getClinic((formData.get("clinicId") as string) || "demo");
+    if (!clinic) {
+      return NextResponse.json({ error: "Unknown clinic." }, { status: 403 });
+    }
+
+    const ip = getClientIp(req.headers);
+    const ipOk = checkRateLimit(`analyze:ip:${ip}`, IP_ANALYZE_RULE);
+    const clinicOk = checkRateLimit(`analyze:clinic:${clinic.id}`, {
+      limit: clinic.dailyAnalysisLimit,
+      windowMs: CLINIC_DAY_WINDOW_MS,
+    });
+    if (!ipOk || !clinicOk) {
+      return NextResponse.json({ error: t.rateLimited }, { status: 429 });
+    }
+
+    const file = formData.get("photo") as File | null;
+    if (!file) {
+      return NextResponse.json({ error: t.noPhoto }, { status: 400 });
+    }
     if (!file.type.startsWith("image/")) {
-      return NextResponse.json({ error: "Dozvoljene su samo slike (JPG, PNG, WEBP)." }, { status: 400 });
+      return NextResponse.json({ error: t.onlyImages }, { status: 400 });
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      return NextResponse.json({ error: t.onlyImages }, { status: 400 });
     }
 
     const bytes = await file.arrayBuffer();
     const base64 = Buffer.from(bytes).toString("base64");
-    const mimeType = file.type;
 
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash-exp",
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.5-flash",
       generationConfig: {
         responseMimeType: "application/json",
-      }
+      },
     });
 
-    const prompt = `Ti si vrhunski estetski stomatolog sa 15+ godina iskustva u Beogradu, specijalizovan za osmehni dizajn (Hollywood Smile, facijalnu estetiku i digitalni smile design).
+    const prompt = `You are a top-tier aesthetic dentist with 15+ years of experience, specialized in smile design (Hollywood Smile, facial aesthetics, and digital smile design).
 
-Analiziraš fotografiju osmeha potencijalnog pacijenta za kliniku "${clinicName}".
+You are analyzing a smile photo of a prospective patient for the clinic "${clinic.name}".
 
-**VAŽNA PRAVILA:**
-- Odgovaraj ISKLJUČIVO na srpskom jeziku, ljubaznim, empatičnim i profesionalnim tonom.
-- Ovo NIJE medicinska dijagnoza. Uvek naglasi da je ovo orijentaciona analiza i da je obavezan pregled kod stomatologa.
-- Fokusiraj se na estetske mogućnosti i kako pacijent može dobiti lepši, samouvereniji osmeh.
-- Koristi realne, popularne tretmane u Srbiji (keramičke krunice, porcelanski viniri, zubni aligneri, izbeljivanje, Hollywood smile, gingivalni contouring, implantati ako je vidljivo).
+**IMPORTANT RULES:**
+- ${promptLanguageInstruction[lang]}
+- This is NOT a medical diagnosis. Always emphasize that this is an orientational analysis and an in-person dental examination is required.
+- Focus on aesthetic possibilities and how the patient can achieve a more beautiful, confident smile.
+- Recommend realistic, widely available treatments (ceramic crowns, porcelain veneers, clear aligners, whitening, Hollywood smile, gingival contouring, implants if visibly relevant).
+- Be warm and encouraging, never alarming or judgmental.
+- If the photo does not clearly show a smile or teeth, say so politely in the "impression" field and return an empty "areas" and "treatments" list with urgency "low".
 
-Na osnovu fotografije vrati SAMO validan JSON u sledećoj šemi:
+Based on the photo, return ONLY valid JSON in this exact schema (keys in English, values in the language specified above):
 
 {
-  "utisak": "Kratak, topao utisak o osmehu (1-2 rečenice)",
-  "oblasti": ["lista od 2-4 najuočljivije estetske oblasti koje mogu da se poboljšaju"],
-  "tretmani": [
+  "impression": "Short, warm impression of the smile (1-2 sentences)",
+  "areas": ["list of 2-4 most noticeable aesthetic areas that could be improved"],
+  "treatments": [
     {
-      "naziv": "Naziv tretmana (npr. Porcelanski viniri, Hollywood Smile komplet)",
-      "razlog": "Zašto bi ovaj tretman bio koristan za ovog pacijenta",
-      "cena_okvirna": "Orijentaciona cena u Beogradu (npr. od 450€ po zubu)"
+      "name": "Treatment name (e.g. Porcelain veneers, Hollywood Smile package)",
+      "reason": "Why this treatment would benefit this patient"
     }
   ],
-  "hitnost": "niska | srednja | visoka",
-  "poruka": "Topla, motivaciona poruka pacijentu (2-3 rečenice) koja ga podstiče da zakaže konsultaciju"
+  "urgency": "low | medium | high",
+  "message": "Warm, motivating message to the patient (2-3 sentences) encouraging them to book a consultation"
 }
 
-Primer dobre analize treba da bude konkretna, empatična i usmerena ka akciji (zakazivanje pregleda).
+A good analysis is concrete, empathetic, and action-oriented (booking a consultation).
 
-Počni analizu.`;
+Begin the analysis.`;
 
     const result = await model.generateContent([
       prompt,
       {
         inlineData: {
-          mimeType: mimeType as string,
+          mimeType: file.type,
           data: base64,
         },
       },
@@ -85,20 +111,15 @@ Počni analizu.`;
 
     const responseText = result.response.text().trim();
     const parsed = JSON.parse(responseText);
-
     const validated = AnalysisSchema.parse(parsed);
 
     return NextResponse.json({
       ...validated,
-      disclaimer: "Ovo je AI orijentaciona analiza za estetske mogućnosti. Nije zamena za pregled kod stomatologa. Sve preporuke zahtevaju klinički pregled i rendgenske snimke.",
-      clinic: clinicName
+      disclaimer: t.disclaimer,
+      clinic: clinic.name,
     });
-
-  } catch (error: any) {
+  } catch (error) {
     console.error("[Smile Analysis Error]:", error);
-    return NextResponse.json({
-      error: "Došlo je do greške pri analizi. Molimo pokušajte ponovo sa boljom fotografijom.",
-      details: error.message
-    }, { status: 500 });
+    return NextResponse.json({ error: t.analysisError }, { status: 500 });
   }
 }

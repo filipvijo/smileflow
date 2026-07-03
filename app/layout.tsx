@@ -17,8 +17,9 @@ const dmSerif = DM_Serif_Display({
 });
 
 export const metadata: Metadata = {
-  title: "SmileFlow • High-Performance AI Lead Acquisition for Dentists",
-  description: "The premier AI smile analysis widget for modern dental clinics.",
+  title: "SmileFlow — AI Smile Analysis Widget for Dental Clinics",
+  description:
+    "Turn your clinic's website visitors into consultation requests. Patients upload a selfie, get an instant AI smile report — you get a qualified lead in your inbox.",
 };
 
 export default function RootLayout({
@@ -27,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="sr" className={`${inter.variable} ${dmSerif.variable} scroll-smooth`}>
+    <html lang="en" className={`${inter.variable} ${dmSerif.variable} scroll-smooth`}>
       <body className="antialiased selection:bg-[#D4AF37] selection:text-black">
         {children}
         <Toaster position="top-center" expand={true} richColors theme="dark" />
