@@ -1,12 +1,46 @@
 "use client";
 
 import SmileWidget from "../components/SmileWidget";
+import RoiChart from "../components/RoiChart";
+import HowItWorksDiagram from "../components/HowItWorksDiagram";
+import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { MoveRight, ChevronDown, Check } from "lucide-react";
 
 const CONTACT_EMAIL = "croolstudio@gmail.com";
 const mailto = (subject: string) =>
   `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
+
+const faqs = [
+  {
+    q: "What is an AI smile analysis widget?",
+    a: "An AI smile analysis widget is a tool embedded on a dental clinic's website that lets visitors upload a photo of their smile and instantly receive an AI-generated aesthetic assessment, including suggested cosmetic treatments. SmileFlow is one such widget, built specifically for lead generation: it captures the visitor's name, email, and phone number before revealing the full report.",
+  },
+  {
+    q: "How much does SmileFlow cost?",
+    a: "SmileFlow's Clinic plan is a flat $149 per month for unlimited smile analyses and unlimited leads on one clinic website, with founding pricing locked in for the first 20 clinics. An Agency white-label plan for marketing agencies managing multiple clinics is $499 per month for unlimited installs. There are no per-consultation or per-lead fees.",
+  },
+  {
+    q: "Is AI smile analysis a medical diagnosis?",
+    a: "No. SmileFlow's reports are an AI-generated orientation of aesthetic possibilities, not a medical diagnosis. Every report includes a disclaimer stating that an in-person examination and X-rays by a licensed dentist are required before any treatment decision.",
+  },
+  {
+    q: "Does SmileFlow store patient photos?",
+    a: "No. Photos are analyzed in real time by Google's Gemini model and are not stored on SmileFlow's servers.",
+  },
+  {
+    q: "How is SmileFlow different from SmileSnap and other virtual consultation tools?",
+    a: "SmileSnap and similar virtual consultation tools typically charge a premium subscription plus a per-consultation fee (commonly around $25 per consult) and route photos to a human reviewer, with results delivered after a delay. SmileFlow returns an instant AI-generated report in seconds, charges one flat monthly fee with no per-lead metering, and is designed around a lead-capture flow rather than an async review queue.",
+  },
+  {
+    q: "How long does it take to install SmileFlow on a clinic website?",
+    a: "Installation is a single script tag pasted anywhere on the page, similar to installing Google Analytics. It works on WordPress, Wix, Squarespace, and custom-built sites, and typically takes under five minutes.",
+  },
+  {
+    q: "What languages does SmileFlow support?",
+    a: "SmileFlow currently supports English and Serbian, with both the widget interface and the AI-generated report available in the visitor's language. French, German, and Spanish are planned next.",
+  },
+];
 
 export default function LuxuryLanding() {
   const { scrollYProgress } = useScroll();
@@ -23,6 +57,7 @@ export default function LuxuryLanding() {
           <a href="#demo">Live Demo</a>
           <a href="#roi">The Math</a>
           <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
           <a href={mailto("SmileFlow inquiry")}>Contact</a>
         </div>
       </nav>
@@ -126,27 +161,30 @@ export default function LuxuryLanding() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-0 divide-y md:divide-y-0 divide-white/5">
-            {[
-              {
-                title: "$50–119",
-                sub: "What a single dental lead costs via Google Ads and Local Services in most US markets.",
-              },
-              {
-                title: "$3,000+",
-                sub: "Typical value of one accepted cosmetic case — veneers, aligners, or an implant.",
-              },
-              {
-                title: "Unlimited",
-                sub: "Leads included in every SmileFlow plan. No per-consult fees, ever. One case pays for years.",
-              },
-            ].map((f, i) => (
-              <div key={i} className="group p-8 md:p-16 md:border-r border-white/5 last:border-0 hover:bg-white hover:text-black transition-all duration-500">
-                <div className="text-[#C5A038] mb-6 md:mb-12 text-sm font-bold">0{i + 1}</div>
-                <h4 className="text-3xl md:text-5xl font-bold mb-4 md:mb-8 tracking-tighter">{f.title}</h4>
-                <p className="text-base md:text-lg opacity-50 group-hover:opacity-100 transition-opacity leading-relaxed">{f.sub}</p>
-              </div>
-            ))}
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+            <div className="p-6 md:p-10 rounded-3xl bg-black/30 border border-white/10 space-y-4">
+              <RoiChart />
+              <Link href="/dental-lead-costs" className="text-xs text-[#C5A038] font-bold uppercase tracking-widest">
+                See full sourced data &rarr;
+              </Link>
+            </div>
+            <div className="space-y-8">
+              {[
+                {
+                  title: "$3,000+",
+                  sub: "Typical value of one accepted cosmetic case — veneers, aligners, or an implant. One closed case pays for years of the widget.",
+                },
+                {
+                  title: "Unlimited",
+                  sub: "Leads included in every SmileFlow plan. No per-consult fees, ever — unlike metered competitors.",
+                },
+              ].map((f, i) => (
+                <div key={i} className="border-l-2 border-[#C5A038]/40 pl-6">
+                  <h4 className="text-3xl md:text-4xl font-bold mb-2 tracking-tighter">{f.title}</h4>
+                  <p className="text-base opacity-50 leading-relaxed">{f.sub}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -157,6 +195,12 @@ export default function LuxuryLanding() {
           <div className="space-y-4 md:space-y-6">
             <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#C5A038]">Phase 02 — Installation</h3>
             <h2 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase">One line. Any website.</h2>
+          </div>
+
+          <div className="overflow-x-auto -mx-6 px-6 md:mx-0 md:px-0">
+            <div className="min-w-[600px] md:min-w-0">
+              <HowItWorksDiagram />
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-center">
@@ -286,6 +330,41 @@ export default function LuxuryLanding() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section id="faq" className="py-24 md:py-48 px-6 md:px-12 border-t border-white/5">
+        <div className="max-w-4xl mx-auto space-y-12 md:space-y-16">
+          <div className="space-y-4 md:space-y-6 text-center">
+            <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#C5A038]">Frequently Asked</h3>
+            <h2 className="text-5xl md:text-6xl font-bold tracking-tighter uppercase">Questions</h2>
+          </div>
+
+          <div className="space-y-10 md:space-y-12">
+            {faqs.map((faq, i) => (
+              <div key={i} className="space-y-2 border-b border-white/5 pb-10 last:border-0">
+                <h3 className="text-xl md:text-2xl font-bold text-white">{faq.q}</h3>
+                <p className="text-white/50 text-base md:text-lg leading-relaxed">{faq.a}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((faq) => ({
+              "@type": "Question",
+              name: faq.q,
+              acceptedAnswer: { "@type": "Answer", text: faq.a },
+            })),
+          }),
+        }}
+      />
+
       {/* CTA */}
       <section className="py-32 md:py-64 text-center px-6 md:px-12">
         <h2 className="text-[clamp(3rem,14vw,16rem)] font-bold tracking-[-0.04em] leading-[0.88] uppercase mb-16 md:mb-20 pointer-events-none select-none">
@@ -310,6 +389,8 @@ export default function LuxuryLanding() {
           </span>
           <div className="w-full h-px bg-white/10 hidden md:block mx-12"></div>
           <div className="flex gap-8 md:gap-12 text-[10px] font-bold uppercase tracking-widest">
+            <Link href="/compare">Compare</Link>
+            <Link href="/dental-lead-costs">Lead cost data</Link>
             <a href={mailto("SmileFlow privacy question")}>Privacy</a>
             <a href={mailto("SmileFlow terms question")}>Terms</a>
             <a href={mailto("SmileFlow inquiry")}>Contact</a>
