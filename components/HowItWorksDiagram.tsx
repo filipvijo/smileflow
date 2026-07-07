@@ -1,114 +1,51 @@
 "use client";
 
+import { Fragment } from "react";
 import { motion } from "framer-motion";
+import { Upload, Sparkles, Mail, ArrowRight } from "lucide-react";
 
 const steps = [
-  {
-    lines: ["Patient uploads", "a photo"],
-    detail: ["One selfie of their", "smile, any device"],
-    icon: "upload" as const,
-  },
-  {
-    lines: ["AI analyzes in", "seconds"],
-    detail: ["Aesthetic report +", "treatment ideas"],
-    icon: "spark" as const,
-  },
-  {
-    lines: ["You get the", "lead"],
-    detail: ["Name, email, phone", "in your inbox"],
-    icon: "mail" as const,
-  },
+  { icon: Upload, title: "Patient uploads a photo", detail: "One selfie of their smile, any device" },
+  { icon: Sparkles, title: "AI analyzes in seconds", detail: "Aesthetic report and treatment ideas" },
+  { icon: Mail, title: "You get the lead", detail: "Name, email, phone in your inbox" },
 ];
-
-function StepIcon({ type, cx, cy }: { type: "upload" | "spark" | "mail"; cx: number; cy: number }) {
-  const stroke = "#C5A038";
-  if (type === "upload") {
-    return (
-      <g transform={`translate(${cx}, ${cy})`} stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
-        <path d="M0,-8 L0,5" />
-        <path d="M-6,-2 L0,-8 L6,-2" />
-        <path d="M-8,9 L8,9" />
-      </g>
-    );
-  }
-  if (type === "spark") {
-    return (
-      <g transform={`translate(${cx}, ${cy})`} fill={stroke}>
-        <path d="M0,-9 C1,-3 3,-1 9,0 C3,1 1,3 0,9 C-1,3 -3,1 -9,0 C-3,-1 -1,-3 0,-9 Z" />
-      </g>
-    );
-  }
-  return (
-    <g transform={`translate(${cx}, ${cy})`} stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none">
-      <rect x="-9" y="-6" width="18" height="12" rx="2" />
-      <path d="M-9,-6 L0,1 L9,-6" />
-    </g>
-  );
-}
 
 export default function HowItWorksDiagram() {
   return (
-    <svg
-      viewBox="0 0 720 200"
-      className="w-full h-auto"
-      role="img"
-      aria-label="Three step flow: a patient uploads a photo, the AI analyzes it in seconds, and the clinic receives the lead."
-    >
-      <title>How SmileFlow works</title>
-      <desc>
-        Three step diagram: step one, patient uploads a photo of their smile. Step two, AI
-        analyzes the photo in seconds and produces an aesthetic report. Step three, the clinic
-        receives the patient&apos;s name, email, and phone as a qualified lead.
-      </desc>
-
-      <defs>
-        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-          <path d="M0,0 L8,4 L0,8 Z" fill="#C5A038" />
-        </marker>
-      </defs>
-
-      {steps.map((step, i) => {
-        const x = i * 240;
-        return (
-          <motion.g
-            key={step.lines[0]}
-            initial={{ opacity: 0, y: 18 }}
+    <div className="flex flex-col md:flex-row items-stretch md:items-center gap-6 md:gap-4">
+      {steps.map((step, i) => (
+        <Fragment key={step.title}>
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.6, delay: i * 0.18, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 0.6, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="flex-1 p-8 md:p-9 rounded-[2rem] border border-white/10 bg-gradient-to-b from-white/[0.05] to-white/[0.01] space-y-6 transition-all duration-300 hover:-translate-y-2 hover:border-[#C5A038]/40 hover:shadow-[0_24px_48px_-16px_rgba(212,175,55,0.3)]"
           >
-            <rect x={x + 12} y={20} width={200} height={140} rx={20} fill="#FDFCFB" opacity="0.04" />
-            <rect x={x + 12} y={20} width={200} height={140} rx={20} fill="none" stroke="#FDFCFB" strokeOpacity="0.12" />
-            <circle cx={x + 44} cy={54} r={18} fill="#C5A038" opacity="0.15" />
-            <StepIcon type={step.icon} cx={x + 44} cy={54} />
-            <text x={x + 32} y={98} fontSize="15" fontWeight="700" fill="#FDFCFB">
-              <tspan x={x + 32} dy="0">{step.lines[0]}</tspan>
-              <tspan x={x + 32} dy="18">{step.lines[1]}</tspan>
-            </text>
-            <text x={x + 32} y={143} fontSize="12" fill="#FDFCFB" opacity="0.5">
-              <tspan x={x + 32} dy="0">{step.detail[0]}</tspan>
-              <tspan x={x + 32} dy="16">{step.detail[1]}</tspan>
-            </text>
-          </motion.g>
-        );
-      })}
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#C5A038] flex items-center justify-center shadow-lg shadow-[#D4AF37]/20">
+              <step.icon className="w-6 h-6 text-black" strokeWidth={2} />
+            </div>
+            <div className="space-y-2">
+              <div className="text-[10px] uppercase tracking-widest font-bold text-[#C5A038]">Step {i + 1}</div>
+              <h4 className="text-xl md:text-2xl font-bold text-white leading-snug tracking-tight">{step.title}</h4>
+              <p className="text-sm text-white/50 leading-relaxed">{step.detail}</p>
+            </div>
+          </motion.div>
 
-      {[0, 1].map((i) => {
-        const x = i * 240;
-        return (
-          <motion.path
-            key={i}
-            d={`M ${x + 216} 90 L ${x + 236} 90`}
-            stroke="#C5A038"
-            strokeWidth="2"
-            markerEnd="url(#arrow)"
-            initial={{ pathLength: 0, opacity: 0 }}
-            whileInView={{ pathLength: 1, opacity: 1 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5, delay: 0.3 + i * 0.18, ease: "easeOut" }}
-          />
-        );
-      })}
-    </svg>
+          {i < steps.length - 1 && (
+            <motion.div
+              key={`arrow-${i}`}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.4, delay: 0.35 + i * 0.15 }}
+              className="hidden md:flex items-center justify-center shrink-0 w-9 h-9 rounded-full bg-[#C5A038]/10 border border-[#C5A038]/20"
+            >
+              <ArrowRight className="w-4 h-4 text-[#C5A038]" strokeWidth={2.5} />
+            </motion.div>
+          )}
+        </Fragment>
+      ))}
+    </div>
   );
 }

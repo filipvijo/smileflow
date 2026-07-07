@@ -287,11 +287,7 @@ export default function LuxuryLanding() {
             <h2 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase">One line. Any website.</h2>
           </motion.div>
 
-          <div className="overflow-x-auto -mx-6 px-6 md:mx-0 md:px-0">
-            <div className="min-w-[600px] md:min-w-0">
-              <HowItWorksDiagram />
-            </div>
-          </div>
+          <HowItWorksDiagram />
 
           <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-center">
             <div className="space-y-8 text-base md:text-lg text-white/50 leading-relaxed font-medium">
@@ -319,7 +315,7 @@ export default function LuxuryLanding() {
             <div className="p-6 md:p-10 rounded-3xl bg-black/40 border border-white/10 font-mono text-xs md:text-sm text-white/70 overflow-x-auto">
               <div className="text-white/30 mb-4">{"<!-- Paste before </body> -->"}</div>
               <div>
-                <span className="text-[#C5A038]">&lt;script</span> src=<span className="text-emerald-400">&quot;https://yourdomain.com/embed.js&quot;</span>
+                <span className="text-[#C5A038]">&lt;script</span> src=<span className="text-emerald-400">&quot;https://getsmileflow.com/embed.js&quot;</span>
               </div>
               <div className="pl-8">
                 data-clinic=<span className="text-emerald-400">&quot;your-clinic-id&quot;</span>

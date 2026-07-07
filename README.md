@@ -63,3 +63,21 @@ the Gemini prompt output language. To add French/German/Spanish: add a `Lang` en
 Every report carries a disclaimer: AI orientation of aesthetic possibilities, **not** a medical
 diagnosis; in-person examination required. Keep all marketing copy cosmetic/informational.
 Consent checkbox is required before any contact details are sent.
+
+## Billing and post-payment welcome email
+
+Pricing cards on the landing page link directly to Stripe Payment Links (no checkout code in
+this repo). When someone subscribes, [app/api/stripe-webhook/route.ts](app/api/stripe-webhook/route.ts)
+receives Stripe's `checkout.session.completed` event and sends a welcome/setup email via Resend,
+asking the new customer for their clinic details. It distinguishes Clinic vs Agency by the paid
+amount (`$149` vs `$499`) since Payment Links don't require a signup flow to look up the plan.
+
+There is no automatic account provisioning — after a customer replies with their details, add
+them to [lib/clinics.ts](lib/clinics.ts) by hand and send their embed code. Build a real
+webhook-driven provisioning flow once manual onboarding stops scaling.
+
+To wire this up:
+1. Deploy with `STRIPE_SECRET_KEY` and `STRIPE_WEBHOOK_SECRET` set (see `.env.example`).
+2. In the Stripe Dashboard, add a webhook endpoint at `https://YOUR-DOMAIN/api/stripe-webhook`
+   listening for `checkout.session.completed`, and copy its signing secret into
+   `STRIPE_WEBHOOK_SECRET`.
