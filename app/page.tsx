@@ -383,7 +383,7 @@ export default function LuxuryLanding() {
                   "Cancel anytime",
                 ],
                 cta: "Claim Founding Spot",
-                subject: "SmileFlow Clinic plan — founding spot",
+                checkoutUrl: "https://buy.stripe.com/00w3coe8c4qocOh9fy6oo00",
                 featured: true,
               },
               {
@@ -398,8 +398,8 @@ export default function LuxuryLanding() {
                   "Dedicated support channel",
                   "Revenue share available",
                 ],
-                cta: "Talk Partnership",
-                subject: "SmileFlow agency white-label partnership",
+                cta: "Get Agency Access",
+                checkoutUrl: "https://buy.stripe.com/dRm14g2pu9KI29DajC6oo01",
                 featured: false,
               },
             ].map((plan, i) => (
@@ -427,7 +427,9 @@ export default function LuxuryLanding() {
                   ))}
                 </div>
                 <a
-                  href={mailto(plan.subject)}
+                  href={plan.checkoutUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={plan.featured ? "luxury-button w-full" : "luxury-button-outline w-full"}
                 >
                   {plan.cta}
