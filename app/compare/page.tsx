@@ -1,110 +1,126 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL } from "@/lib/site";
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  CONTENT_DATES,
+  createPageMetadata,
+  serializeJsonLd,
+} from "@/lib/seo";
+import { CONTACT_EMAIL } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: "SmileFlow vs SmileSnap — AI smile analysis widget comparison",
-  description:
-    "How SmileFlow compares to SmileSnap and other virtual dental consultation tools: pricing, response speed, and lead-capture design.",
-  alternates: { canonical: `${SITE_URL}/compare` },
-};
+const title = "SmileFlow vs SmileSnap: dental smile assessment comparison";
+const description =
+  "Compare SmileFlow and SmileSnap on workflow, response speed, lead capture and currently published pricing for dental clinics.";
+const path = "/compare";
+
+export const metadata = createPageMetadata({ title, description, path });
+
+const smileSnapPricingUrl = "https://www.smilesnap.com/pricing";
 
 const rows: [string, string, string][] = [
-  ["Pricing model", "Flat $149/month, unlimited analyses and leads", "Subscription plus roughly $25 per consultation"],
-  ["Response time", "AI report in seconds", "Async — a team member reviews photos, reply may take hours to days"],
-  ["Setup", "One script tag, self-serve", "Onboarding process with the vendor"],
-  ["Lead capture", "Built-in gated report (name, email, phone before results)", "Consultation request form"],
-  ["Languages", "English, Serbian (French, German, Spanish planned)", "Primarily English"],
-  ["Best for", "Clinics that want instant, always-on AI feedback at a fixed cost", "Practices that want a human-reviewed premium consult experience"],
+  ["Clinic pricing", "$149/month with unlimited analyses and leads", "$249/month Starter or $2,490/year, with 25 consults included"],
+  ["Additional consults", "No per-analysis or per-lead fee", "$25 per additional consult on published plans"],
+  ["Response model", "Automated AI orientation returned in seconds", "Clinic team reviews the submission and responds asynchronously"],
+  ["Setup", "One script tag for the clinic website", "Vendor account, widget configuration and clinic workflow setup"],
+  ["Lead capture", "Contact details and consent are collected before the full report", "Virtual consultation request and patient intake workflow"],
+  ["Best fit", "Clinics wanting an instant, always-on first step at a fixed cost", "Practices wanting staff-led virtual consultation and treatment coordination"],
 ];
 
 const faqs = [
   {
     q: "Is SmileFlow a replacement for SmileSnap?",
-    a: "SmileFlow and SmileSnap solve the same problem — turning website visitors into dental leads — with different mechanics. SmileFlow returns an instant AI report and charges a flat unlimited fee; SmileSnap centers on human-reviewed virtual consultations with a per-consult charge on top of its subscription. Clinics choose based on whether they want instant AI feedback or a human-reviewed premium experience.",
+    a: "Not in every workflow. SmileFlow is designed for instant AI-generated aesthetic orientation and lead capture. SmileSnap is designed around a clinic-led virtual consultation workflow. The right choice depends on whether the practice wants immediate automated engagement or a staff-reviewed consultation process.",
   },
   {
-    q: "Which is cheaper, SmileFlow or SmileSnap?",
-    a: "At published rates, SmileFlow is flat-fee and unlimited starting at $149 per month. SmileSnap's public pricing has referenced roughly $2,499 per year plus about $25 per consultation, which means cost rises with volume. A clinic running high visitor volume will generally find SmileFlow's flat pricing cheaper per lead as volume grows.",
+    q: "Which platform has the more predictable cost?",
+    a: "SmileFlow uses a flat $149 monthly clinic plan with unlimited analyses and leads. SmileSnap currently publishes tiered plans, included consult limits and a $25 charge for additional consults. Clinics should confirm current SmileSnap terms directly before purchasing.",
   },
 ];
 
-export default function ComparePage() {
-  return (
-    <div className="min-h-screen bg-[#0D1B2A] text-[#FDFCFB] px-6 md:px-12 py-24 md:py-32">
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: faqs.map((faq) => ({
-              "@type": "Question",
-              name: faq.q,
-              acceptedAnswer: { "@type": "Answer", text: faq.a },
-            })),
-          }),
-        }}
-      />
+const article = articleJsonLd({
+  headline: title,
+  description,
+  path,
+  datePublished: CONTENT_DATES.compare,
+  about: ["Dental virtual consultations", "AI smile analysis", "Dental lead generation software"],
+  citations: [smileSnapPricingUrl],
+});
 
-      <div className="max-w-4xl mx-auto space-y-16">
-        <div className="space-y-6">
-          <Link href="/" className="text-[10px] uppercase tracking-widest font-bold text-[#C5A038]">
-            &larr; SmileFlow
-          </Link>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">SmileFlow vs SmileSnap</h1>
-          <p className="text-white/60 text-lg leading-relaxed max-w-2xl">
-            Both are AI/virtual smile assessment widgets for dental clinic websites. Here is how they
-            differ on pricing, speed, and lead capture, based on each vendor&apos;s publicly stated pricing
-            and product design as of 2026.
+export default function ComparePage() {
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: { "@type": "Answer", text: faq.a },
+    })),
+  };
+
+  return (
+    <main className="editorial-page">
+      {[article, breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Comparison", path }]), faqJsonLd].map((data, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }}
+        />
+      ))}
+
+      <div className="editorial-wrap">
+        <div className="editorial-hero">
+          <Link href="/" className="editorial-back">&larr; SmileFlow</Link>
+          <div className="editorial-meta">Independent comparison · Reviewed {CONTENT_DATES.compare}</div>
+          <h1>SmileFlow vs <em>SmileSnap</em></h1>
+          <p>
+            Both products help dental websites turn visitor interest into consultation opportunities,
+            but they use different workflows. This comparison separates verified public facts from
+            our interpretation of which clinic each approach may suit.
           </p>
         </div>
 
-        <div className="overflow-x-auto rounded-2xl border border-white/10">
-          <table className="w-full text-left border-collapse min-w-[560px]">
+        <div className="comparison-table-wrap">
+          <table className="comparison-table">
             <thead>
-              <tr className="bg-white/[0.03]">
-                <th className="p-4 text-xs uppercase tracking-widest font-bold text-white/50">Dimension</th>
-                <th className="p-4 text-xs uppercase tracking-widest font-bold text-[#C5A038]">SmileFlow</th>
-                <th className="p-4 text-xs uppercase tracking-widest font-bold text-white/50">SmileSnap</th>
-              </tr>
+              <tr><th>Dimension</th><th>SmileFlow</th><th>SmileSnap</th></tr>
             </thead>
             <tbody>
-              {rows.map((row, i) => (
-                <tr key={i} className="border-t border-white/5">
-                  {row.map((cell, j) => (
-                    <td key={j} className={`p-4 text-sm leading-relaxed ${j === 0 ? "text-white/50 font-bold" : "text-white/80"}`}>
-                      {cell}
-                    </td>
-                  ))}
+              {rows.map((row) => (
+                <tr key={row[0]}>
+                  {row.map((cell, index) => <td key={cell} className={index === 0 ? "dimension" : ""}>{cell}</td>)}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
 
-        <div className="space-y-10">
-          {faqs.map((faq, i) => (
-            <div key={i} className="space-y-2 border-b border-white/5 pb-8 last:border-0">
-              <h2 className="text-xl md:text-2xl font-bold">{faq.q}</h2>
-              <p className="text-white/60 leading-relaxed">{faq.a}</p>
-            </div>
-          ))}
+        <section className="editorial-callout">
+          <h2>Source and methodology</h2>
+          <p>
+            SmileFlow details reflect the current product and published checkout pricing. SmileSnap
+            pricing and plan limits were checked against its official pricing page on {CONTENT_DATES.compare}.
+            Product terms can change, so verify them before making a purchasing decision.
+          </p>
+          <a href={smileSnapPricingUrl} target="_blank" rel="noopener noreferrer" className="source-link">
+            View SmileSnap&apos;s official pricing page ↗
+          </a>
+        </section>
+
+        <div className="editorial-faqs">
+          {faqs.map((faq) => <div key={faq.q}><h2>{faq.q}</h2><p>{faq.a}</p></div>)}
         </div>
 
-        <p className="text-xs text-white/30 leading-relaxed">
-          Pricing and feature comparisons reflect publicly available information at the time of writing and
-          may change. SmileSnap is a trademark of its respective owner; this page is an independent
-          comparison and is not affiliated with or endorsed by SmileSnap.
+        <p className="editorial-disclaimer">
+          SmileSnap is a trademark of its respective owner. This independent comparison is not
+          affiliated with or endorsed by SmileSnap. No feature or pricing claim should replace a
+          vendor&apos;s current contract or product documentation.
         </p>
 
-        <div className="pt-8">
-          <a href={`mailto:croolstudio@gmail.com?subject=${encodeURIComponent("SmileFlow — install on my clinic website")}`} className="luxury-button">
-            Try SmileFlow
-          </a>
+        <div className="editorial-actions">
+          <a href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("SmileFlow — install on my clinic website")}`} className="button button-primary">Try SmileFlow</a>
+          <Link href="/resources" className="text-link">Explore dental growth resources →</Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

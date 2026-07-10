@@ -5,7 +5,26 @@ import { apiStrings, promptLanguageInstruction, resolveLang } from "@/lib/i18n";
 import { getClinic } from "@/lib/clinics";
 import { checkRateLimit, getClientIp, IP_ANALYZE_RULE, CLINIC_DAY_WINDOW_MS } from "@/lib/rateLimit";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+function getGenAI(): GoogleGenerativeAI {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
+  return new GoogleGenerativeAI(apiKey);
+}
+
+function hasSupportedImageSignature(bytes: Uint8Array, mimeType: string): boolean {
+  const isJpeg = bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+  const isPng = bytes.length >= 8 && [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a].every((value, index) => bytes[index] === value);
+  const isWebp = bytes.length >= 12 && Buffer.from(bytes.subarray(0, 4)).toString("ascii") === "RIFF" && Buffer.from(bytes.subarray(8, 12)).toString("ascii") === "WEBP";
+  const isGif = bytes.length >= 6 && ["GIF87a", "GIF89a"].includes(Buffer.from(bytes.subarray(0, 6)).toString("ascii"));
+  const isHeif = bytes.length >= 12 && Buffer.from(bytes.subarray(4, 8)).toString("ascii") === "ftyp";
+
+  if (mimeType === "image/jpeg") return isJpeg;
+  if (mimeType === "image/png") return isPng;
+  if (mimeType === "image/webp") return isWebp;
+  if (mimeType === "image/gif") return isGif;
+  if (["image/heic", "image/heif"].includes(mimeType)) return isHeif;
+  return false;
+}
 
 const AnalysisSchema = z.object({
   impression: z.string().min(10),
@@ -51,17 +70,22 @@ export async function POST(req: NextRequest) {
     if (!file) {
       return NextResponse.json({ error: t.noPhoto }, { status: 400 });
     }
-    if (!file.type.startsWith("image/")) {
+    const supportedMimeTypes = ["image/jpeg", "image/png", "image/webp", "image/gif", "image/heic", "image/heif"];
+    if (!supportedMimeTypes.includes(file.type)) {
       return NextResponse.json({ error: t.onlyImages }, { status: 400 });
     }
-    if (file.size > 8 * 1024 * 1024) {
+    if (file.size < 256 || file.size > 8 * 1024 * 1024) {
       return NextResponse.json({ error: t.onlyImages }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
+    const arrayBuffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    if (!hasSupportedImageSignature(bytes, file.type)) {
+      return NextResponse.json({ error: t.onlyImages }, { status: 400 });
+    }
     const base64 = Buffer.from(bytes).toString("base64");
 
-    const model = genAI.getGenerativeModel({
+    const model = getGenAI().getGenerativeModel({
       model: "gemini-2.5-flash",
       generationConfig: {
         responseMimeType: "application/json",

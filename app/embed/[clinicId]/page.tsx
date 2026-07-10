@@ -2,8 +2,19 @@ import { headers } from "next/headers";
 import SmileWidget from "@/components/SmileWidget";
 import { getClinic, isHostAllowed } from "@/lib/clinics";
 import { resolveLang } from "@/lib/i18n";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Smile analysis widget",
+  robots: {
+    index: false,
+    follow: false,
+    noarchive: true,
+    nosnippet: true,
+  },
+};
 
 export default async function EmbedPage({
   params,

@@ -1,4 +1,5 @@
 import type { Lang } from "./i18n";
+import { CONTACT_EMAIL } from "./site";
 
 export interface ClinicConfig {
   /** URL-safe unique id used in embed URLs and API calls. Use something unguessable for real clients. */
@@ -31,7 +32,7 @@ const clinics: ClinicConfig[] = [
     id: "demo",
     name: "SmileFlow Demo Clinic",
     defaultLang: "en",
-    notifyEmail: process.env.LEAD_BCC_EMAIL ?? "croolstudio@gmail.com",
+    notifyEmail: process.env.LEAD_BCC_EMAIL ?? CONTACT_EMAIL,
     allowedHosts: [],
     dailyAnalysisLimit: 200,
     active: true,
@@ -41,7 +42,7 @@ const clinics: ClinicConfig[] = [
     id: "orto-demo-rs",
     name: "Vaša Klinika",
     defaultLang: "sr",
-    notifyEmail: process.env.LEAD_BCC_EMAIL ?? "croolstudio@gmail.com",
+    notifyEmail: process.env.LEAD_BCC_EMAIL ?? CONTACT_EMAIL,
     allowedHosts: [],
     dailyAnalysisLimit: 100,
     active: true,

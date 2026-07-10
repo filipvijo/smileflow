@@ -35,6 +35,33 @@ interface SmileWidgetProps {
   embedded?: boolean;
 }
 
+interface StatusBadgeProps {
+  urgency: AnalysisResult["urgency"];
+  statusLabel: string;
+  config: Record<AnalysisResult["urgency"], {
+    label: string;
+    color: string;
+    icon: typeof CheckCircle;
+    bg: string;
+  }>;
+}
+
+function StatusBadge({ urgency, statusLabel, config }: StatusBadgeProps) {
+  const cfg = config[urgency];
+  const Icon = cfg.icon;
+  return (
+    <div className={`flex items-center gap-4 p-5 rounded-3xl ${cfg.bg} border border-white/5`}>
+      <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+        <Icon className="w-6 h-6" style={{ color: cfg.color }} />
+      </div>
+      <div>
+        <p className="text-[10px] uppercase tracking-widest font-bold opacity-50 mb-0.5">{statusLabel}</p>
+        <p className="font-bold text-sm lg:text-base" style={{ color: cfg.color }}>{cfg.label}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function SmileWidget({
   clinicId = "demo",
   lang: langProp = "en",
@@ -56,6 +83,7 @@ export default function SmileWidget({
   const [submittingLead, setSubmittingLead] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const submissionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!embedded || !rootRef.current || typeof ResizeObserver === "undefined") return;
@@ -126,6 +154,7 @@ export default function SmileWidget({
       return;
     }
     setSubmittingLead(true);
+    submissionIdRef.current ??= crypto.randomUUID();
     try {
       const res = await fetch("/api/lead", {
         method: "POST",
@@ -137,6 +166,7 @@ export default function SmileWidget({
           email: leadEmail.trim(),
           phone: leadPhone.trim(),
           consent: true,
+          submissionId: submissionIdRef.current,
           summary: result
             ? {
                 impression: result.impression.slice(0, 600),
@@ -165,33 +195,19 @@ export default function SmileWidget({
     setLeadEmail("");
     setLeadPhone("");
     setConsent(false);
+    submissionIdRef.current = null;
     setStage("upload");
-  };
-
-  const StatusBadge = ({ urgency }: { urgency: AnalysisResult["urgency"] }) => {
-    const cfg = statusConfig[urgency];
-    return (
-      <div className={`flex items-center gap-4 p-5 rounded-3xl ${cfg.bg} border border-white/5`}>
-        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-          {React.createElement(cfg.icon, { className: "w-6 h-6", style: { color: cfg.color } })}
-        </div>
-        <div>
-          <p className="text-[10px] uppercase tracking-widest font-bold opacity-50 mb-0.5">{t.statusLabel}</p>
-          <p className="font-bold text-sm lg:text-base" style={{ color: cfg.color }}>{cfg.label}</p>
-        </div>
-      </div>
-    );
   };
 
   return (
     <div
       ref={rootRef}
-      className="w-full max-w-xl mx-auto bg-white/[0.03] border border-white/10 backdrop-blur-2xl rounded-[2.5rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)]"
+      className="w-full max-w-xl mx-auto bg-[#17383c] border border-white/10 rounded-[2rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.35)]"
     >
       <div className="px-8 py-6 border-b border-white/5 bg-white/[0.02] flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#C5A038] flex items-center justify-center shadow-lg shadow-[#D4AF37]/20">
-            <Sparkles className="w-6 h-6 text-black" />
+          <div className="w-12 h-12 rounded-2xl bg-[#A9EADC] flex items-center justify-center shadow-lg shadow-[#A9EADC]/20">
+            <Sparkles className="w-6 h-6 text-[#102B2F]" />
           </div>
           <div>
             <h3 className="font-bold text-lg tracking-tight text-white">{t.headerTitle}</h3>
@@ -206,19 +222,31 @@ export default function SmileWidget({
           <div className="space-y-8">
             <div
               onClick={() => inputRef.current?.click()}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  inputRef.current?.click();
+                }
+              }}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 e.preventDefault();
                 if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
               }}
               className={`relative border-2 border-dashed rounded-[2rem] p-12 text-center transition-all cursor-pointer group
-                ${preview ? "border-[#D4AF37]/50 bg-[#D4AF37]/5" : "border-white/10 hover:border-[#D4AF37]/30 hover:bg-white/[0.02]"}`}
+                ${preview ? "border-[#A9EADC]/50 bg-[#A9EADC]/5" : "border-white/10 hover:border-[#A9EADC]/40 hover:bg-white/[0.02]"}`}
+              role={preview ? undefined : "button"}
+              tabIndex={preview ? -1 : 0}
+              aria-label={preview ? undefined : t.uploadTitle}
             >
               {preview ? (
                 <div className="relative inline-block group">
-                  <img src={preview} alt="Smile" className="max-h-64 rounded-2xl shadow-2xl transition-transform group-hover:scale-[1.02]" />
+                  {/* A user-selected data URL is intentionally rendered directly. */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={preview} alt="Selected smile preview" className="max-h-64 rounded-2xl shadow-2xl transition-transform group-hover:scale-[1.02]" />
                   <button
                     onClick={(e) => { e.stopPropagation(); setPreview(null); setFile(null); }}
+                    aria-label="Remove selected smile photo"
                     className="absolute -top-4 -right-4 w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-red-600 transition-colors"
                   >
                     <X size={20} />
@@ -226,8 +254,8 @@ export default function SmileWidget({
                 </div>
               ) : (
                 <div className="space-y-6">
-                  <div className="mx-auto w-24 h-24 rounded-3xl bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:bg-[#D4AF37]/10 group-hover:border-[#D4AF37]/30 transition-all duration-500">
-                    <Upload className="w-10 h-10 text-[#A3B8CC] group-hover:text-[#D4AF37] transition-colors" />
+                  <div className="mx-auto w-24 h-24 rounded-3xl bg-white/[0.03] border border-white/10 flex items-center justify-center group-hover:bg-[#A9EADC]/10 group-hover:border-[#A9EADC]/30 transition-all duration-500">
+                    <Upload className="w-10 h-10 text-[#A9EADC]/60 group-hover:text-[#A9EADC] transition-colors" />
                   </div>
                   <div className="space-y-2">
                     <h4 className="text-2xl font-bold tracking-tight text-white">{t.uploadTitle}</h4>
@@ -249,7 +277,7 @@ export default function SmileWidget({
               <button
                 onClick={handleAnalyze}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 text-lg h-16 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#C5A038] text-black font-bold hover:opacity-90 transition-opacity disabled:opacity-60 group"
+                className="w-full flex items-center justify-center gap-3 text-lg h-16 rounded-2xl bg-[#A9EADC] text-[#102B2F] font-bold hover:bg-[#C4F4EA] transition-colors disabled:opacity-60 group"
               >
                 {loading ? (
                   <div className="flex items-center gap-3">
@@ -271,11 +299,11 @@ export default function SmileWidget({
 
         {stage === "teaser" && result && (
           <motion.div initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="space-y-8">
-            <StatusBadge urgency={result.urgency} />
+            <StatusBadge urgency={result.urgency} statusLabel={t.statusLabel} config={statusConfig} />
 
             <div className="space-y-3 text-center">
               <h4 className="text-2xl font-bold tracking-tight text-white">{t.teaserTitle}</h4>
-              <p className="text-[#D4AF37] font-bold text-sm uppercase tracking-widest">
+              <p className="text-[#A9EADC] font-bold text-sm uppercase tracking-widest">
                 {t.teaserFound(result.treatments.length)}
               </p>
               <p className="text-white/50 text-sm max-w-sm mx-auto leading-relaxed">{t.teaserSubtitle}</p>
@@ -289,15 +317,15 @@ export default function SmileWidget({
                 </div>
               ))}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-14 h-14 rounded-2xl bg-[#0D1B2A]/80 border border-[#D4AF37]/40 flex items-center justify-center backdrop-blur">
-                  <Lock className="w-6 h-6 text-[#D4AF37]" />
+                <div className="w-14 h-14 rounded-2xl bg-[#102B2F]/80 border border-[#A9EADC]/40 flex items-center justify-center backdrop-blur">
+                  <Lock className="w-6 h-6 text-[#A9EADC]" />
                 </div>
               </div>
             </div>
 
             <button
               onClick={() => setStage("form")}
-              className="w-full h-16 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#C5A038] text-black font-bold text-lg flex items-center justify-center gap-3 hover:opacity-90 transition-opacity group"
+              className="w-full h-16 rounded-2xl bg-[#A9EADC] text-[#102B2F] font-bold text-lg flex items-center justify-center gap-3 hover:bg-[#C4F4EA] transition-colors group"
             >
               {t.unlockButton}
               <ChevronRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
@@ -324,7 +352,7 @@ export default function SmileWidget({
                   value={leadName}
                   onChange={(e) => setLeadName(e.target.value)}
                   placeholder={t.namePlaceholder}
-                  className="w-full h-13 px-4 py-3.5 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-[#D4AF37]/60 focus:outline-none transition-colors"
+                  className="w-full h-13 px-4 py-3.5 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-[#A9EADC]/70 focus:outline-none transition-colors"
                 />
               </div>
               <div className="space-y-1.5">
@@ -334,7 +362,7 @@ export default function SmileWidget({
                   value={leadEmail}
                   onChange={(e) => setLeadEmail(e.target.value)}
                   placeholder={t.emailPlaceholder}
-                  className="w-full h-13 px-4 py-3.5 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-[#D4AF37]/60 focus:outline-none transition-colors"
+                  className="w-full h-13 px-4 py-3.5 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-[#A9EADC]/70 focus:outline-none transition-colors"
                 />
               </div>
               <div className="space-y-1.5">
@@ -344,7 +372,7 @@ export default function SmileWidget({
                   value={leadPhone}
                   onChange={(e) => setLeadPhone(e.target.value)}
                   placeholder={t.phonePlaceholder}
-                  className="w-full h-13 px-4 py-3.5 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-[#D4AF37]/60 focus:outline-none transition-colors"
+                  className="w-full h-13 px-4 py-3.5 rounded-xl bg-white/[0.04] border border-white/10 text-white placeholder:text-white/25 focus:border-[#A9EADC]/70 focus:outline-none transition-colors"
                 />
               </div>
             </div>
@@ -354,7 +382,7 @@ export default function SmileWidget({
                 type="checkbox"
                 checked={consent}
                 onChange={(e) => setConsent(e.target.checked)}
-                className="mt-1 w-4 h-4 accent-[#D4AF37]"
+                className="mt-1 w-4 h-4 accent-[#A9EADC]"
               />
               <span className="text-xs text-white/50 leading-relaxed">{t.consentText}</span>
             </label>
@@ -362,7 +390,7 @@ export default function SmileWidget({
             <button
               type="submit"
               disabled={submittingLead}
-              className="w-full h-16 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#C5A038] text-black font-bold text-lg flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-60"
+              className="w-full h-16 rounded-2xl bg-[#A9EADC] text-[#102B2F] font-bold text-lg flex items-center justify-center gap-3 hover:bg-[#C4F4EA] transition-colors disabled:opacity-60"
             >
               {submittingLead ? (
                 <div className="flex items-center gap-3">
@@ -381,20 +409,20 @@ export default function SmileWidget({
         {stage === "report" && result && (
           <AnimatePresence>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="space-y-10">
-              <StatusBadge urgency={result.urgency} />
+              <StatusBadge urgency={result.urgency} statusLabel={t.statusLabel} config={statusConfig} />
 
               <div className="space-y-4">
-                <h4 className="text-[11px] uppercase tracking-[0.25em] font-bold text-[#D4AF37]">{t.impressionTitle}</h4>
+                <h4 className="text-[11px] uppercase tracking-[0.25em] font-bold text-[#A9EADC]">{t.impressionTitle}</h4>
                 <p className="text-xl md:text-2xl font-serif text-white/90 leading-tight italic">&ldquo;{result.impression}&rdquo;</p>
               </div>
 
               {result.areas.length > 0 && (
                 <div className="space-y-4">
-                  <h4 className="text-[11px] uppercase tracking-[0.25em] font-bold text-[#D4AF37]">{t.areasTitle}</h4>
+                  <h4 className="text-[11px] uppercase tracking-[0.25em] font-bold text-[#A9EADC]">{t.areasTitle}</h4>
                   <div className="grid grid-cols-1 gap-3">
                     {result.areas.map((item, i) => (
                       <div key={i} className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl flex items-center gap-4 group hover:bg-white/[0.05] transition-colors">
-                        <div className="w-8 h-8 rounded-lg bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] font-bold text-xs">{i + 1}</div>
+                        <div className="w-8 h-8 rounded-lg bg-[#A9EADC]/10 flex items-center justify-center text-[#A9EADC] font-bold text-xs">{i + 1}</div>
                         <span className="text-sm md:text-base text-white/80">{item}</span>
                       </div>
                     ))}
@@ -404,7 +432,7 @@ export default function SmileWidget({
 
               {result.treatments.length > 0 && (
                 <div className="space-y-6">
-                  <h4 className="text-[11px] uppercase tracking-[0.25em] font-bold text-[#D4AF37]">{t.treatmentsTitle}</h4>
+                  <h4 className="text-[11px] uppercase tracking-[0.25em] font-bold text-[#A9EADC]">{t.treatmentsTitle}</h4>
                   {result.treatments.map((tr, i) => (
                     <div key={i} className="p-6 rounded-3xl bg-gradient-to-br from-white/[0.05] to-transparent border border-white/10 space-y-3">
                       <h5 className="font-bold text-lg text-white">{tr.name}</h5>
@@ -415,7 +443,7 @@ export default function SmileWidget({
               )}
 
               <div className="space-y-4">
-                <h4 className="text-[11px] uppercase tracking-[0.25em] font-bold text-[#D4AF37]">{t.messageTitle}</h4>
+                <h4 className="text-[11px] uppercase tracking-[0.25em] font-bold text-[#A9EADC]">{t.messageTitle}</h4>
                 <p className="text-base text-white/70 leading-relaxed italic">{result.message}</p>
               </div>
 
@@ -428,12 +456,12 @@ export default function SmileWidget({
                     href={bookingUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 h-14 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#C5A038] text-black font-bold flex items-center justify-center hover:opacity-90 transition-opacity"
+                    className="flex-1 h-14 rounded-2xl bg-[#FF6D58] text-[#102B2F] font-bold flex items-center justify-center hover:bg-[#FF8775] transition-colors"
                   >
                     {t.bookConsultation}
                   </a>
                 ) : (
-                  <button className="flex-1 h-14 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#C5A038] text-black font-bold hover:opacity-90 transition-opacity">
+                  <button className="flex-1 h-14 rounded-2xl bg-[#FF6D58] text-[#102B2F] font-bold hover:bg-[#FF8775] transition-colors">
                     {t.bookConsultation}
                   </button>
                 )}

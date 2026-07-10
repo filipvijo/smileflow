@@ -1,511 +1,333 @@
 "use client";
 
-import SmileWidget from "../components/SmileWidget";
-import RoiChart from "../components/RoiChart";
-import HowItWorksDiagram from "../components/HowItWorksDiagram";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { MoveRight, ChevronDown, Check } from "lucide-react";
+import { motion } from "framer-motion";
+import {
+  ArrowDownRight,
+  ArrowRight,
+  Check,
+  CircleCheck,
+  Code2,
+  LockKeyhole,
+  Mail,
+  ScanFace,
+  ShieldCheck,
+  Sparkles,
+  Upload,
+} from "lucide-react";
+import SmileWidget from "@/components/SmileWidget";
+import RoiCalculator from "@/components/RoiCalculator";
+import { serializeJsonLd } from "@/lib/seo";
+import { CONTACT_EMAIL } from "@/lib/site";
 
-const treatmentIcons = [
-  { src: "/images/icon-whitening.png", label: "Whitening" },
-  { src: "/images/icon-checkup.png", label: "Check-ups" },
-  { src: "/images/icon-braces.png", label: "Orthodontics" },
-];
-
-const revealProps = {
-  initial: { opacity: 0, y: 32 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const },
-};
-
-const CONTACT_EMAIL = "croolstudio@gmail.com";
 const mailto = (subject: string) =>
   `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
 
-const faqs = [
+const reveal = {
+  initial: { opacity: 0, y: 28 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-80px" },
+  transition: { duration: 0.75, ease: [0.16, 1, 0.3, 1] as const },
+};
+
+const journey = [
   {
-    q: "What is an AI smile analysis widget?",
-    a: "An AI smile analysis widget is a tool embedded on a dental clinic's website that lets visitors upload a photo of their smile and instantly receive an AI-generated aesthetic assessment, including suggested cosmetic treatments. SmileFlow is one such widget, built specifically for lead generation: it captures the visitor's name, email, and phone number before revealing the full report.",
+    number: "01",
+    icon: Upload,
+    title: "Curiosity becomes action",
+    text: "A visitor uploads one smile photo from any device. No account, no app, no waiting room.",
   },
   {
-    q: "How much does SmileFlow cost?",
-    a: "SmileFlow's Clinic plan is a flat $149 per month for unlimited smile analyses and unlimited leads on one clinic website, with founding pricing locked in for the first 20 clinics. An Agency white-label plan for marketing agencies managing multiple clinics is $499 per month for unlimited installs. There are no per-consultation or per-lead fees.",
+    number: "02",
+    icon: ScanFace,
+    title: "AI creates the spark",
+    text: "In seconds, they see a thoughtful preview of aesthetic possibilities tailored to their smile.",
   },
   {
-    q: "Is AI smile analysis a medical diagnosis?",
-    a: "No. SmileFlow's reports are an AI-generated orientation of aesthetic possibilities, not a medical diagnosis. Every report includes a disclaimer stating that an in-person examination and X-rays by a licensed dentist are required before any treatment decision.",
-  },
-  {
-    q: "Does SmileFlow store patient photos?",
-    a: "No. Photos are analyzed in real time by Google's Gemini model and are not stored on SmileFlow's servers.",
-  },
-  {
-    q: "How is SmileFlow different from SmileSnap and other virtual consultation tools?",
-    a: "SmileSnap and similar virtual consultation tools typically charge a premium subscription plus a per-consultation fee (commonly around $25 per consult) and route photos to a human reviewer, with results delivered after a delay. SmileFlow returns an instant AI-generated report in seconds, charges one flat monthly fee with no per-lead metering, and is designed around a lead-capture flow rather than an async review queue.",
-  },
-  {
-    q: "How long does it take to install SmileFlow on a clinic website?",
-    a: "Installation is a single script tag pasted anywhere on the page, similar to installing Google Analytics. It works on WordPress, Wix, Squarespace, and custom-built sites, and typically takes under five minutes.",
-  },
-  {
-    q: "What languages does SmileFlow support?",
-    a: "SmileFlow currently supports English and Serbian, with both the widget interface and the AI-generated report available in the visitor's language. French, German, and Spanish are planned next.",
+    number: "03",
+    icon: Mail,
+    title: "Your team gets the lead",
+    text: "Name, phone, email and treatment interest arrive while motivation is at its highest.",
   },
 ];
 
-export default function LuxuryLanding() {
-  const { scrollYProgress } = useScroll();
-  const y1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
+const faqs = [
+  {
+    q: "Is this a medical diagnosis?",
+    a: "No. SmileFlow provides an AI-generated orientation of aesthetic possibilities. Every report clearly states that an in-person examination and X-rays by a licensed dentist are required before treatment decisions.",
+  },
+  {
+    q: "Are patient photos stored?",
+    a: "No. Photos are analyzed in real time and are not stored on SmileFlow servers.",
+  },
+  {
+    q: "Will it work on our website?",
+    a: "Yes. A single script tag works on WordPress, Wix, Squarespace and custom websites. Installation typically takes less than five minutes.",
+  },
+  {
+    q: "Can it match our clinic brand?",
+    a: "Yes. The widget can be configured for your clinic, booking link and language. White-label options are available for agencies managing multiple practices.",
+  },
+];
 
+export default function Home() {
   return (
-    <div className="relative min-h-screen bg-[#0D1B2A] text-[#FDFCFB] overflow-x-hidden">
-      <div
-        className="fixed inset-0 z-[1] pointer-events-none opacity-[0.05] mix-blend-overlay"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }}
-      />
+    <main className="site-shell">
+      <div className="ambient-orb ambient-orb-one" />
+      <div className="ambient-orb ambient-orb-two" />
 
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 w-full z-[100] h-20 md:h-32 flex items-center justify-between px-6 md:px-12 mix-blend-difference">
-        <div className="text-lg md:text-xl font-bold tracking-tighter uppercase leading-none cursor-pointer">
-          SmileFlow<span className="text-[#C5A038]">.</span>
-        </div>
-        <div className="hidden md:flex items-center gap-12 font-bold text-[10px] tracking-[0.3em] uppercase opacity-60">
-          {[
-            { href: "#demo", label: "Live Demo" },
-            { href: "#roi", label: "The Math" },
-            { href: "#pricing", label: "Pricing" },
-            { href: "#faq", label: "FAQ" },
-            { href: mailto("SmileFlow inquiry"), label: "Contact" },
-          ].map((link) => (
-            <a key={link.label} href={link.href} className="group relative pb-1 hover:opacity-100 transition-opacity">
-              {link.label}
-              <span className="absolute left-0 bottom-0 h-px w-0 bg-current transition-all duration-300 group-hover:w-full" />
-            </a>
-          ))}
-        </div>
-      </nav>
+      <header className="site-nav">
+        <a href="#top" className="brand-mark" aria-label="SmileFlow home">
+          <span className="brand-spark">S</span>
+          <span>SmileFlow</span>
+        </a>
+        <nav className="nav-links" aria-label="Primary navigation">
+          <a href="#experience">Experience</a>
+          <a href="#journey">How it works</a>
+          <a href="#roi">ROI</a>
+          <a href="#pricing">Pricing</a>
+        </nav>
+        <a className="nav-cta" href={mailto("SmileFlow clinic installation")}>For your clinic <ArrowRight /></a>
+      </header>
 
-      {/* Hero */}
-      <section className="relative min-h-screen flex items-center px-6 md:px-12 pt-24 md:pt-20 pb-16 md:pb-0">
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-12 gap-6 md:gap-12 items-end">
-          <div className="col-span-12 lg:col-span-9 space-y-8 md:space-y-12">
-            <motion.div
-              initial={{ opacity: 0, x: -100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            >
-              <h1 className="hero-text">Your Website <br /> Should Sell Smiles<span className="text-[#C5A038]">.</span></h1>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 1 }}
-              className="flex items-start gap-6 md:gap-12"
-            >
-              <div className="w-px h-24 md:h-32 bg-white/20 shrink-0"></div>
-              <p className="max-w-lg text-base md:text-xl font-medium leading-relaxed text-white/60">
-                SmileFlow is an AI smile-analysis widget that turns your clinic&apos;s website visitors into
-                consultation requests. Patients upload a selfie, get an instant aesthetic report — you get their
-                name, contact, and treatment interest in your inbox.
-              </p>
-            </motion.div>
-          </div>
-
-          <div className="col-span-12 lg:col-span-3 pb-0 md:pb-4 mt-4 md:mt-0 space-y-6 md:space-y-8">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, rotate: -4 }}
-              animate={{ opacity: 1, scale: 1, rotate: -3 }}
-              transition={{ duration: 0.9, delay: 0.3 }}
-              className="lg:hidden w-32 sm:w-40 mx-auto"
-            >
-              <div className="p-2 rounded-[1.5rem] bg-gradient-to-br from-[#D4AF37] to-[#C5A038] shadow-[0_16px_32px_-8px_rgba(0,0,0,0.6)]">
-                <div className="rounded-[1.15rem] overflow-hidden border-4 border-[#0D1B2A]">
-                  <Image
-                    src="/images/hero-smile.png"
-                    alt="Real patient smile analyzed by SmileFlow"
-                    width={400}
-                    height={460}
-                    className="w-full h-auto object-cover"
-                    priority
-                  />
-                </div>
-              </div>
-            </motion.div>
-
-            <div className="flex flex-col gap-4 md:gap-6">
-              <a href={mailto("SmileFlow — install on my clinic website")} className="luxury-button">Get It On Your Site</a>
-              <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-[#C5A038] text-center lg:text-left">
-                Live in dental clinics since 2026
-              </div>
-            </div>
-          </div>
+      <section id="top" className="hero-section">
+        <div className="hero-copy">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="eyebrow"
+          >
+            <span className="live-dot" /> AI patient acquisition for dental clinics
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            Turn a curious smile into a <em>booked consultation.</em>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.25 }}
+            className="hero-lede"
+          >
+            SmileFlow transforms passive website visitors into qualified cosmetic-dentistry leads with an instant, private AI smile experience.
+          </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.35 }}
+            className="hero-actions"
+          >
+            <a href="#experience" className="button button-primary">Try the patient experience <ArrowDownRight /></a>
+            <a href="#journey" className="text-link">See how it converts <ArrowRight /></a>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 0.6 }}
+            className="hero-trust"
+          >
+            <span><ShieldCheck /> Photos never stored</span>
+            <span><Code2 /> Installs in minutes</span>
+          </motion.div>
         </div>
 
         <motion.div
-          initial={{ opacity: 0, scale: 0.9, rotate: 6 }}
-          animate={{ opacity: 1, scale: 1, rotate: 3, y: [0, -14, 0] }}
-          transition={{
-            opacity: { duration: 1, delay: 0.6 },
-            scale: { duration: 1, delay: 0.6 },
-            rotate: { duration: 1, delay: 0.6 },
-            y: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1.6 },
-          }}
-          className="hidden lg:block absolute top-24 right-10 xl:right-20 w-72 xl:w-80"
+          initial={{ opacity: 0, scale: 0.94, rotate: 2 }}
+          animate={{ opacity: 1, scale: 1, rotate: 0 }}
+          transition={{ duration: 1.1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="hero-visual"
         >
-          <div className="p-2.5 rounded-[2rem] bg-gradient-to-br from-[#D4AF37] to-[#C5A038] shadow-[0_32px_64px_-12px_rgba(0,0,0,0.6)]">
-            <div className="rounded-[1.75rem] overflow-hidden border-4 border-[#0D1B2A]">
-              <Image
-                src="/images/hero-smile.png"
-                alt="Real patient smile analyzed by SmileFlow"
-                width={500}
-                height={575}
-                className="w-full h-auto object-cover"
-                priority
-              />
-            </div>
+          <div className="visual-label"><Sparkles /> Live patient journey</div>
+          <div className="smile-frame">
+            <Image
+              src="/images/hero-smile.png"
+              alt="Patient smile ready for an AI aesthetic analysis"
+              fill
+              priority
+              sizes="(max-width: 900px) 90vw, 46vw"
+              className="smile-photo"
+            />
+            <div className="scan-line" />
+            <span className="scan-corner scan-corner-tl" />
+            <span className="scan-corner scan-corner-tr" />
+            <span className="scan-corner scan-corner-bl" />
+            <span className="scan-corner scan-corner-br" />
+            <div className="analysis-pill"><span /> Smile analysis complete</div>
           </div>
-        </motion.div>
-
-        <div className="hidden md:flex absolute bottom-12 left-12 items-center gap-4 group cursor-pointer">
-          <div className="w-12 h-12 border border-white/20 rounded-full flex items-center justify-center group-hover:bg-white group-hover:text-black transition-all">
-            <ChevronDown className="w-4 h-4" />
-          </div>
-          <span className="text-[10px] font-bold tracking-widest uppercase opacity-40">Try it yourself below</span>
-        </div>
-      </section>
-
-      {/* Demo section */}
-      <section id="demo" className="py-24 md:py-60 px-6 md:px-12 border-t border-white/5">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 md:gap-32 items-center">
-          <motion.div {...revealProps} className="space-y-10 md:space-y-16">
-            <div className="space-y-4 md:space-y-6">
-              <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#C5A038]">Phase 01 — The Patient Experience</h3>
-              <h2 className="text-5xl md:text-8xl font-bold tracking-tighter leading-none italic font-serif">
-                Conversion through <br /> Curiosity<span className="text-[#C5A038]">.</span>
-              </h2>
-            </div>
-
-            <div className="space-y-6 md:space-y-8 text-base md:text-lg text-white/50 leading-relaxed font-medium">
-              <p>
-                A visitor who uploads a photo of their own smile is not browsing — they are already imagining a
-                better one. SmileFlow gives them an instant, professional AI assessment and asks for their contact
-                details at the exact moment their motivation peaks.
-              </p>
-              <p>
-                Every unlocked report is a qualified lead in your inbox: name, email, phone, and the treatments
-                the AI flagged. Try the full flow right here.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-8 md:gap-20 py-8 md:py-12 border-y border-white/10">
-              <div className="transition-transform duration-300 hover:-translate-y-1">
-                <div className="text-[10px] uppercase tracking-widest font-bold opacity-30 mb-2">Analysis Speed</div>
-                <div className="text-4xl md:text-5xl font-bold tracking-tighter">~5 sec</div>
-              </div>
-              <div className="transition-transform duration-300 hover:-translate-y-1">
-                <div className="text-[10px] uppercase tracking-widest font-bold opacity-30 mb-2">Photos Stored</div>
-                <div className="text-4xl md:text-5xl font-bold tracking-tighter">Zero</div>
-              </div>
-            </div>
-          </motion.div>
-
-          <div className="relative">
-            <motion.div style={{ y: y1 }} className="absolute -top-40 -right-40 text-[20rem] font-bold text-white/[0.02] select-none uppercase pointer-events-none hidden lg:block">
-              AI
-            </motion.div>
-            <SmileWidget clinicId="demo" lang="en" />
-          </div>
-        </div>
-      </section>
-
-      {/* ROI section */}
-      <section id="roi" className="py-24 md:py-60 px-6 md:px-12 bg-white/[0.01]">
-        <div className="max-w-7xl mx-auto">
-          <motion.div {...revealProps} className="flex flex-col md:flex-row md:justify-between md:items-end mb-16 md:mb-32 border-b border-white/10 pb-8 md:pb-12 gap-4">
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase">The Math</h2>
-            <p className="text-sm font-bold opacity-30 max-w-md text-left md:text-right">
-              You already pay for traffic. SmileFlow converts it.
-            </p>
-          </motion.div>
-
-          <motion.div {...revealProps} className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div className="relative overflow-hidden p-6 md:p-10 rounded-3xl bg-black/30 border border-white/10 space-y-4">
-              <Image
-                src="/images/before-after-art.png"
-                alt=""
-                fill
-                aria-hidden="true"
-                className="object-cover opacity-[0.08] mix-blend-luminosity pointer-events-none select-none"
-              />
-              <div className="relative z-10 space-y-4">
-                <RoiChart />
-                <Link href="/dental-lead-costs" className="inline-block text-xs text-[#C5A038] font-bold uppercase tracking-widest hover:text-[#E5C26B] transition-colors">
-                  See full sourced data &rarr;
-                </Link>
-              </div>
-            </div>
-            <div className="space-y-8">
-              {[
-                {
-                  title: "$3,000+",
-                  sub: "Typical value of one accepted cosmetic case — veneers, aligners, or an implant. One closed case pays for years of the widget.",
-                },
-                {
-                  title: "Unlimited",
-                  sub: "Leads included in every SmileFlow plan. No per-consult fees, ever — unlike metered competitors.",
-                },
-              ].map((f, i) => (
-                <div key={i} className="border-l-2 border-[#C5A038]/40 pl-6 transition-all duration-300 hover:border-[#C5A038] hover:pl-8">
-                  <h4 className="text-3xl md:text-4xl font-bold mb-2 tracking-tighter">{f.title}</h4>
-                  <p className="text-base opacity-50 leading-relaxed">{f.sub}</p>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="relative py-24 md:py-48 px-6 md:px-12 border-t border-white/5 overflow-hidden">
-        <Image
-          src="/images/before-after-art.png"
-          alt=""
-          fill
-          aria-hidden="true"
-          className="object-cover object-right opacity-[0.06] mix-blend-luminosity pointer-events-none select-none"
-        />
-        <div className="relative z-10 max-w-7xl mx-auto space-y-16 md:space-y-24">
-          <motion.div {...revealProps} className="space-y-4 md:space-y-6">
-            <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#C5A038]">Phase 02 — Installation</h3>
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase">One line. Any website.</h2>
-          </motion.div>
-
-          <HowItWorksDiagram />
-
-          <div className="grid md:grid-cols-2 gap-12 md:gap-24 items-center">
-            <div className="space-y-8 text-base md:text-lg text-white/50 leading-relaxed font-medium">
-              <p>
-                Your web team (or ours) pastes a single script tag anywhere on your site. The widget inherits your
-                clinic&apos;s language, sends every lead to your front desk email, and works on WordPress, Wix,
-                Squarespace, and custom sites alike.
-              </p>
-              <div className="space-y-4">
-                {[
-                  "Instant lead notifications to your inbox",
-                  "Photos analyzed in real time, never stored",
-                  "GDPR-conscious consent built into the flow",
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-4 -mx-2 px-2 py-1 rounded-lg transition-colors duration-200 hover:bg-white/[0.03]">
-                    <div className="w-6 h-6 rounded-full bg-[#C5A038]/10 flex items-center justify-center shrink-0">
-                      <Check className="w-3.5 h-3.5 text-[#C5A038]" />
-                    </div>
-                    <span className="text-white/70">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="p-6 md:p-10 rounded-3xl bg-black/40 border border-white/10 font-mono text-xs md:text-sm text-white/70 overflow-x-auto">
-              <div className="text-white/30 mb-4">{"<!-- Paste before </body> -->"}</div>
-              <div>
-                <span className="text-[#C5A038]">&lt;script</span> src=<span className="text-emerald-400">&quot;https://getsmileflow.com/embed.js&quot;</span>
-              </div>
-              <div className="pl-8">
-                data-clinic=<span className="text-emerald-400">&quot;your-clinic-id&quot;</span>
-              </div>
-              <div className="pl-8">
-                data-lang=<span className="text-emerald-400">&quot;en&quot;</span>
-              </div>
-              <div className="pl-8">
-                data-booking=<span className="text-emerald-400">&quot;https://yourclinic.com/book&quot;</span><span className="text-[#C5A038]">&gt;</span>
-              </div>
-              <div>
-                <span className="text-[#C5A038]">&lt;/script&gt;</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Treatment recognition strip */}
-      <section className="py-16 md:py-24 px-6 md:px-12 border-t border-white/5">
-        <motion.div {...revealProps} className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10 md:gap-6">
-          <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/30 text-center md:text-left shrink-0">
-            Recognizes treatment opportunities like
-          </p>
-          <div className="flex items-center gap-8 md:gap-12">
-            {treatmentIcons.map((icon) => (
-              <div key={icon.label} className="flex flex-col items-center gap-3 group">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-[#FDFCFB] p-2.5 shadow-lg transition-transform duration-300 group-hover:-translate-y-1.5 group-hover:shadow-[0_16px_32px_-8px_rgba(212,175,55,0.35)]">
-                  <Image src={icon.src} alt={icon.label} width={80} height={80} className="w-full h-full object-contain" />
-                </div>
-                <span className="text-[10px] uppercase tracking-widest font-bold text-white/40">{icon.label}</span>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="py-24 md:py-48 px-6 md:px-12 bg-white/[0.01] border-t border-white/5">
-        <div className="max-w-7xl mx-auto space-y-16 md:space-y-24">
-          <motion.div {...revealProps} className="space-y-4 md:space-y-6 text-center">
-            <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#C5A038]">Founding Pricing</h3>
-            <h2 className="text-5xl md:text-7xl font-bold tracking-tighter uppercase">Simple. Flat. Unlimited.</h2>
-            <p className="text-white/40 max-w-xl mx-auto text-base md:text-lg">
-              Locked in for life for the first 20 clinics. Competing tools charge $200+ monthly plus $25 per consultation.
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            {[
-              {
-                name: "Clinic",
-                price: "$149",
-                period: "/month",
-                features: [
-                  "Widget on one clinic website",
-                  "Unlimited smile analyses",
-                  "Unlimited leads to your inbox",
-                  "English + Serbian included",
-                  "Setup done for you",
-                  "Cancel anytime",
-                ],
-                cta: "Claim Founding Spot",
-                checkoutUrl: "https://buy.stripe.com/00w3coe8c4qocOh9fy6oo00",
-                featured: true,
-              },
-              {
-                name: "Agency / White-label",
-                price: "$499",
-                period: "/month",
-                features: [
-                  "Unlimited clinic installs",
-                  "Your branding on the widget",
-                  "Priority feature requests",
-                  "Co-branded sales materials",
-                  "Dedicated support channel",
-                  "Revenue share available",
-                ],
-                cta: "Get Agency Access",
-                checkoutUrl: "https://buy.stripe.com/dRm14g2pu9KI29DajC6oo01",
-                featured: false,
-              },
-            ].map((plan, i) => (
-              <div
-                key={i}
-                className={`p-8 md:p-12 rounded-[2.5rem] space-y-8 border transition-all duration-500 hover:-translate-y-2 ${
-                  plan.featured
-                    ? "border-[#C5A038]/60 bg-[#C5A038]/[0.04] hover:shadow-[0_24px_48px_-12px_rgba(212,175,55,0.25)]"
-                    : "border-white/10 bg-white/[0.02] hover:border-white/25 hover:shadow-[0_24px_48px_-12px_rgba(0,0,0,0.4)]"
-                }`}
-              >
-                <div className="space-y-2">
-                  <div className="text-[10px] uppercase tracking-[0.3em] font-bold text-[#C5A038]">{plan.name}</div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-5xl md:text-6xl font-bold tracking-tighter">{plan.price}</span>
-                    <span className="text-white/40 font-bold">{plan.period}</span>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  {plan.features.map((f, j) => (
-                    <div key={j} className="flex items-center gap-3">
-                      <Check className="w-4 h-4 text-[#C5A038] shrink-0" />
-                      <span className="text-sm md:text-base text-white/70">{f}</span>
-                    </div>
-                  ))}
-                </div>
-                <a
-                  href={plan.checkoutUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={plan.featured ? "luxury-button w-full" : "luxury-button-outline w-full"}
-                >
-                  {plan.cta}
-                </a>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section id="faq" className="py-24 md:py-48 px-6 md:px-12 border-t border-white/5">
-        <div className="max-w-4xl mx-auto space-y-12 md:space-y-16">
-          <motion.div {...revealProps} className="space-y-4 md:space-y-6 text-center">
-            <h3 className="text-[10px] uppercase tracking-[0.4em] font-bold text-[#C5A038]">Frequently Asked</h3>
-            <h2 className="text-5xl md:text-6xl font-bold tracking-tighter uppercase">Questions</h2>
-          </motion.div>
-
-          <motion.div {...revealProps} className="space-y-10 md:space-y-12">
-            {faqs.map((faq, i) => (
-              <div key={i} className="space-y-2 border-b border-white/5 pb-10 last:border-0 -mx-4 px-4 py-2 rounded-2xl transition-colors duration-300 hover:bg-white/[0.02]">
-                <h3 className="text-xl md:text-2xl font-bold text-white">{faq.q}</h3>
-                <p className="text-white/50 text-base md:text-lg leading-relaxed">{faq.a}</p>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      <script
-        type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            mainEntity: faqs.map((faq) => ({
-              "@type": "Question",
-              name: faq.q,
-              acceptedAnswer: { "@type": "Answer", text: faq.a },
-            })),
-          }),
-        }}
-      />
-
-      {/* CTA */}
-      <section className="py-32 md:py-64 text-center px-6 md:px-12">
-        <motion.h2
-          {...revealProps}
-          className="text-[clamp(3rem,14vw,16rem)] font-bold tracking-[-0.04em] leading-[0.88] uppercase mb-16 md:mb-20 pointer-events-none select-none"
-        >
-          MORE <br /> PATIENTS<span className="text-[#C5A038]">.</span>
-        </motion.h2>
-        <div className="flex flex-col items-center gap-8 md:gap-12">
-          <a
-            href={mailto("SmileFlow — install on my clinic website")}
-            className="luxury-button w-full max-w-xs md:max-w-none md:scale-150 h-16 md:h-20 px-8 md:px-16 group flex items-center justify-center gap-3"
+          <motion.div
+            animate={{ y: [0, -7, 0] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="lead-card"
           >
-            Request Installation <MoveRight className="ml-2 group-hover:translate-x-2 transition-transform" />
-          </a>
-          <p className="text-[10px] uppercase font-bold tracking-[0.4em] text-white/30">Founding pricing ends at 20 clinics</p>
+            <div className="lead-card-icon"><CircleCheck /></div>
+            <div><small>New consultation lead</small><strong>Veneers · High intent</strong></div>
+            <span className="lead-time">now</span>
+          </motion.div>
+          <div className="hero-metric"><strong>~5 sec</strong><span>from selfie to insight</span></div>
+        </motion.div>
+      </section>
+
+      <section className="fact-ribbon" aria-label="Product facts">
+        {[
+          ["Unlimited", "analyses and leads"],
+          ["0", "patient photos stored"],
+          ["1 line", "to install anywhere"],
+          ["EN + SR", "patient languages"],
+        ].map(([value, label]) => (
+          <div key={label}><strong>{value}</strong><span>{label}</span></div>
+        ))}
+      </section>
+
+      <section id="experience" className="experience-section section-pad">
+        <motion.div {...reveal} className="section-intro">
+          <div className="section-number">01 / Patient experience</div>
+          <h2>Don’t explain the product. <em>Let it create desire.</em></h2>
+          <p>Your next patient can experience the exact conversion flow here—upload, analyze, unlock and book.</p>
+        </motion.div>
+        <div className="experience-grid">
+          <motion.div {...reveal} className="experience-notes">
+            <div className="note-card note-aqua">
+              <span>01</span>
+              <h3>The right psychological moment</h3>
+              <p>A visitor who uploads their own smile is already picturing change. SmileFlow captures interest at that precise moment.</p>
+            </div>
+            <div className="note-card note-coral">
+              <span>02</span>
+              <h3>A lead with context</h3>
+              <p>Your team receives more than contact details: the suggested treatments make every follow-up warmer and more relevant.</p>
+            </div>
+          </motion.div>
+          <motion.div {...reveal} className="widget-stage">
+            <div className="widget-stage-top"><span>Interactive demo</span><span className="privacy-chip"><LockKeyhole /> Private by design</span></div>
+            <SmileWidget clinicId="demo" lang="en" />
+          </motion.div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 md:py-20 px-6 md:px-12 border-t border-white/5 opacity-40">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 md:gap-12">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-center md:text-left text-nowrap">
-            SmileFlow 2026 — AI analyses are informational, not medical diagnoses.
-          </span>
-          <div className="w-full h-px bg-white/10 hidden md:block mx-12"></div>
-          <div className="flex gap-8 md:gap-12 text-[10px] font-bold uppercase tracking-widest">
-            <Link href="/compare" className="hover:text-[#C5A038] transition-colors">Compare</Link>
-            <Link href="/dental-lead-costs" className="hover:text-[#C5A038] transition-colors">Lead cost data</Link>
-            <a href={mailto("SmileFlow privacy question")} className="hover:text-[#C5A038] transition-colors">Privacy</a>
-            <a href={mailto("SmileFlow terms question")} className="hover:text-[#C5A038] transition-colors">Terms</a>
-            <a href={mailto("SmileFlow inquiry")} className="hover:text-[#C5A038] transition-colors">Contact</a>
-          </div>
+      <section id="journey" className="journey-section section-pad">
+        <motion.div {...reveal} className="section-intro section-intro-light">
+          <div className="section-number">02 / One patient journey</div>
+          <h2>From “just looking” to <em>ready to talk.</em></h2>
+        </motion.div>
+        <div className="journey-grid">
+          {journey.map((item, index) => (
+            <motion.article
+              key={item.number}
+              {...reveal}
+              transition={{ ...reveal.transition, delay: index * 0.12 }}
+              className="journey-card"
+            >
+              <div className="journey-head"><span>{item.number}</span><item.icon /></div>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </motion.article>
+          ))}
+        </div>
+        <motion.div {...reveal} className="install-strip">
+          <div><Code2 /><span><strong>One line of code.</strong> WordPress, Wix, Squarespace or custom.</span></div>
+          <code>&lt;script src=&quot;getsmileflow.com/embed.js&quot; …&gt;</code>
+        </motion.div>
+      </section>
+
+      <section id="roi" className="roi-section section-pad">
+        <motion.div {...reveal} className="section-intro">
+          <div className="section-number">03 / The business case</div>
+          <h2>Make your existing traffic <em>work harder.</em></h2>
+          <p>Explore a simple scenario using your own numbers. The calculator is illustrative—not a promise of results.</p>
+        </motion.div>
+        <motion.div {...reveal}><RoiCalculator /></motion.div>
+      </section>
+
+      <section className="trust-section section-pad">
+        <motion.div {...reveal} className="trust-copy">
+          <div className="section-number">04 / Responsible by design</div>
+          <h2>Built for curiosity. <em>Bound by clinical reality.</em></h2>
+          <p>SmileFlow creates a thoughtful first step—not a diagnosis. The patient remains informed, the dentist remains essential.</p>
+        </motion.div>
+        <div className="trust-grid">
+          {[
+            [ShieldCheck, "No photo storage", "Images are analyzed in real time and not retained on SmileFlow servers."],
+            [LockKeyhole, "Consent before capture", "Contact details are submitted only after explicit patient consent."],
+            [ScanFace, "No diagnosis claims", "Every result is framed as aesthetic orientation with an in-person exam required."],
+          ].map(([Icon, title, copy]) => {
+            const TrustIcon = Icon as typeof ShieldCheck;
+            return <motion.article key={title as string} {...reveal} className="trust-card"><TrustIcon /><h3>{title as string}</h3><p>{copy as string}</p></motion.article>;
+          })}
+        </div>
+      </section>
+
+      <section id="pricing" className="pricing-section section-pad">
+        <motion.div {...reveal} className="section-intro section-intro-light pricing-intro">
+          <div className="section-number">05 / Founding access</div>
+          <h2>One good case can change <em>the whole equation.</em></h2>
+          <p>Flat monthly pricing. Unlimited analyses. Unlimited leads. No per-consultation meter.</p>
+        </motion.div>
+        <div className="pricing-grid">
+          <motion.article {...reveal} className="price-card price-card-featured">
+            <div className="price-label">For dental clinics <span>Founding plan</span></div>
+            <div className="price"><strong>$149</strong><span>/ month</span></div>
+            <p>Everything one practice needs to turn website curiosity into consultation opportunities.</p>
+            <ul>
+              {["One clinic website", "Unlimited smile analyses", "Unlimited leads to your inbox", "English and Serbian", "Setup done for you", "Cancel anytime"].map((x) => <li key={x}><Check />{x}</li>)}
+            </ul>
+            <a href="https://buy.stripe.com/00w3coe8c4qocOh9fy6oo00" target="_blank" rel="noopener noreferrer" className="button button-primary">Claim a founding spot <ArrowRight /></a>
+          </motion.article>
+          <motion.article {...reveal} className="price-card agency-card">
+            <div className="price-label">For dental agencies</div>
+            <h3>Make SmileFlow yours.</h3>
+            <p>White-label the experience, install it across client sites and give every clinic a more compelling conversion story.</p>
+            <div className="agency-points"><span>Unlimited installs</span><span>Your branding</span><span>Priority support</span></div>
+            <a href="https://buy.stripe.com/dRm14g2pu9KI29DajC6oo01" target="_blank" rel="noopener noreferrer" className="text-link text-link-light">Explore agency access · $499.99/mo <ArrowRight /></a>
+          </motion.article>
+        </div>
+      </section>
+
+      <section id="faq" className="faq-section section-pad">
+        <motion.div {...reveal} className="section-intro"><div className="section-number">Questions, answered</div><h2>Clear before you <em>commit.</em></h2></motion.div>
+        <div className="faq-list">
+          {faqs.map((faq, i) => (
+            <motion.details key={faq.q} {...reveal} className="faq-item">
+              <summary><span>{String(i + 1).padStart(2, "0")}</span>{faq.q}<span className="faq-plus">+</span></summary>
+              <p>{faq.a}</p>
+            </motion.details>
+          ))}
+        </div>
+      </section>
+
+      <section className="closing-section">
+        <div className="closing-orbit" />
+        <motion.div {...reveal}>
+          <span className="eyebrow eyebrow-light"><Sparkles /> Your website can do more</span>
+          <h2>The next patient is already <em>curious.</em></h2>
+          <p>Give them a reason to start the conversation with you.</p>
+          <a href={mailto("SmileFlow — install on my clinic website")} className="button button-coral">Bring SmileFlow to my clinic <ArrowRight /></a>
+        </motion.div>
+      </section>
+
+      <footer className="site-footer">
+        <div className="brand-mark"><span className="brand-spark">S</span><span>SmileFlow</span></div>
+        <p>AI smile analysis for patient acquisition. Informational, never diagnostic.</p>
+        <div>
+          <Link href="/resources">Resources</Link>
+          <Link href="/compare">Compare</Link>
+          <Link href="/about">About</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/security">Security</Link>
+          <a href={mailto("SmileFlow inquiry")}>Contact</a>
         </div>
       </footer>
-    </div>
+
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd({
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((faq) => ({ "@type": "Question", name: faq.q, acceptedAnswer: { "@type": "Answer", text: faq.a } })),
+      }) }} />
+    </main>
   );
 }

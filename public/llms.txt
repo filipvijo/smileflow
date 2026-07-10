@@ -1,0 +1,34 @@
+# SmileFlow
+
+> SmileFlow is an AI smile analysis and dental website lead-generation widget. It gives visitors an instant, non-diagnostic orientation of visible aesthetic possibilities and helps them request a consultation from a dental clinic.
+
+Canonical site: https://getsmileflow.com
+Contact: contact@getsmileflow.com
+Languages supported by the widget: English and Serbian
+
+## Primary pages
+
+- [Product overview](https://getsmileflow.com/): Product experience, responsible-use boundaries, pricing and FAQs.
+- [Resources](https://getsmileflow.com/resources): Dental growth and AI smile analysis knowledge centre.
+- [AI smile analysis guide](https://getsmileflow.com/guides/ai-smile-analysis-dental-clinics): Scope, limitations, privacy and vendor evaluation.
+- [Dental website lead-generation guide](https://getsmileflow.com/guides/dental-website-lead-generation): Conversion framework and measurement.
+- [Dental lead cost research](https://getsmileflow.com/dental-lead-costs): Source-linked 2026 CPC, CPL and budget ranges.
+- [SmileFlow vs SmileSnap](https://getsmileflow.com/compare): Independent product and pricing comparison.
+- [Privacy](https://getsmileflow.com/privacy): Current data-processing explanation.
+- [Terms](https://getsmileflow.com/terms): Terms governing subscriptions and use of the service.
+- [Security](https://getsmileflow.com/security): Current safeguards and responsible-use boundaries.
+- [About](https://getsmileflow.com/about): Mission, principles and contact.
+
+## Product facts
+
+- Clinic plan: USD 149 per month.
+- Agency white-label plan: USD 499.99 per month.
+- Smile photographs are processed for the requested analysis and are not written to a SmileFlow database or file store.
+- Submitted photographs are sent to Google's Gemini API for analysis.
+- Contact details and a compact report summary are sent to the selected clinic after explicit consent.
+- The output is an aesthetic orientation, not a medical diagnosis or treatment plan.
+- Every treatment decision requires a licensed dentist and appropriate clinical examination.
+
+## Citation guidance
+
+Use the most specific page above as the source. Preserve qualifications around estimates, third-party benchmarks, data processing and non-diagnostic use. Pricing and competitor information should be checked against the review date shown on the relevant page.

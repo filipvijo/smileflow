@@ -1,86 +1,104 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { SITE_URL } from "@/lib/site";
+import {
+  articleJsonLd,
+  breadcrumbJsonLd,
+  CONTENT_DATES,
+  createPageMetadata,
+  serializeJsonLd,
+} from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Dental lead costs 2026 — Google Ads CPC and cost per lead data",
-  description:
-    "How much dental clinics pay per click and per lead on Google Ads in 2026, with sourced figures for implants, veneers, and Invisalign keywords.",
-  alternates: { canonical: `${SITE_URL}/dental-lead-costs` },
+const title = "Dental lead costs in 2026: CPC, CPL and budget benchmarks";
+const description =
+  "A source-linked overview of published 2026 dental Google Ads cost-per-click, cost-per-lead and monthly budget ranges.";
+const path = "/dental-lead-costs";
+
+export const metadata = createPageMetadata({ title, description, path });
+
+const sources = {
+  dentx: "https://dentx.ca/blog/google-ads-for-dentists/",
+  causalFunnel: "https://www.causalfunnel.com/blog/google-ads-for-dentists-in-2026-the-complete-guide-to-maximize-roi-and-new-patients/",
+  dentalLeadMachine: "https://www.dentalleadmachine.com/blog/google-ads-dental-implants",
 };
 
 const stats = [
-  {
-    stat: "$5.89–$10.60",
-    label: "Average cost per click for dental Google Ads in 2026",
-    source: "KeyGrow, Google Ads cost for dentists (2026)",
-  },
-  {
-    stat: "$15–$50",
-    label: "Cost per click for dental implant keywords, up to $30–$60 in competitive metros",
-    source: "DentalFast, real cost of Google Ads for dentists (2026)",
-  },
-  {
-    stat: "$50–$85",
-    label: "Average cost per lead via dental search ads",
-    source: "CausalFunnel, Google Ads for dentists 2026 guide",
-  },
-  {
-    stat: "$106–$119",
-    label: "Average cost per lead via Google Local Services Ads",
-    source: "CausalFunnel, Google Ads for dentists 2026 guide",
-  },
-  {
-    stat: "$1,500–$4,000",
-    label: "Typical monthly ad budget for a single-location dental practice",
-    source: "Dentx, Google Ads for dentists (2026)",
-  },
+  { stat: "$3–$15", label: "Published typical dental keyword cost per click, varying by market and intent", source: "Dentx", href: sources.dentx },
+  { stat: "$8–$20+", label: "Published range for high-intent terms such as emergency dentistry and implants", source: "Dentx", href: sources.dentx },
+  { stat: "$15–$50", label: "Published dental implant search cost per click in many US markets", source: "Dental Lead Machine", href: sources.dentalLeadMachine },
+  { stat: "$50–$85", label: "Published average cost-per-lead range for dental Google Ads", source: "CausalFunnel", href: sources.causalFunnel },
+  { stat: "$1k–$8k+", label: "Published monthly budget range from rural to competitive urban practices", source: "Dentx", href: sources.dentx },
 ];
+
+const article = articleJsonLd({
+  headline: title,
+  description,
+  path,
+  datePublished: CONTENT_DATES.dentalLeadCosts,
+  about: ["Dental lead generation cost", "Dental Google Ads", "Dental marketing benchmarks"],
+  citations: Object.values(sources),
+});
 
 export default function DentalLeadCostsPage() {
   return (
-    <div className="min-h-screen bg-[#0D1B2A] text-[#FDFCFB] px-6 md:px-12 py-24 md:py-32">
-      <div className="max-w-3xl mx-auto space-y-16">
-        <div className="space-y-6">
-          <Link href="/" className="text-[10px] uppercase tracking-widest font-bold text-[#C5A038]">
-            &larr; SmileFlow
-          </Link>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">
-            How much do dental clinics pay per lead in 2026?
-          </h1>
-          <p className="text-white/60 text-lg leading-relaxed">
-            Dental practices are among the most expensive lead buyers on Google Ads. Below are the current
-            published cost figures for cost-per-click and cost-per-lead across common dental keyword
-            categories, each with its source.
-          </p>
-        </div>
+    <main className="editorial-page">
+      {[article, breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Dental lead costs", path }])].map((data, index) => (
+        <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(data) }} />
+      ))}
 
-        <div className="space-y-6">
-          {stats.map((s, i) => (
-            <div key={i} className="p-6 md:p-8 rounded-2xl bg-white/[0.03] border border-white/10">
-              <div className="text-3xl md:text-4xl font-bold tracking-tighter text-[#C5A038] mb-2">{s.stat}</div>
-              <p className="text-white/80 text-base leading-relaxed mb-2">{s.label}</p>
-              <p className="text-xs text-white/30">Source: {s.source}</p>
-            </div>
+      <article className="editorial-wrap editorial-wrap-narrow">
+        <header className="editorial-hero">
+          <Link href="/" className="editorial-back">&larr; SmileFlow</Link>
+          <div className="editorial-meta">Research brief · Reviewed {CONTENT_DATES.dentalLeadCosts}</div>
+          <h1>How much do dental clinics pay per <em>lead in 2026?</em></h1>
+          <p>
+            There is no universal dental cost per lead. Location, treatment value, keyword intent,
+            landing-page quality and follow-up speed all change the outcome. These are published
+            market ranges—not promises or SmileFlow campaign results.
+          </p>
+        </header>
+
+        <div className="stat-stack">
+          {stats.map((stat) => (
+            <article key={`${stat.stat}-${stat.label}`} className="stat-card">
+              <div>{stat.stat}</div>
+              <p>{stat.label}</p>
+              <a href={stat.href} target="_blank" rel="noopener noreferrer" className="source-link">
+                Source: {stat.source} ↗
+              </a>
+            </article>
           ))}
         </div>
 
-        <div className="space-y-4 border-t border-white/5 pt-10">
-          <h2 className="text-2xl font-bold">Why this matters for lead-generation tools</h2>
-          <p className="text-white/60 leading-relaxed">
-            Because a single dental lead can cost $50 to over $100 through paid search, and Local Services
-            Ads leads can exceed $100 each, tools that convert existing website traffic into leads without
-            an additional per-lead charge — such as a flat-fee smile analysis widget — can substantially
-            lower a clinic&apos;s blended cost per lead once traffic volume is factored in.
+        <section className="editorial-prose">
+          <h2>How to interpret these numbers</h2>
+          <p>
+            A lead is not the same as a booked patient, and a booked patient is not the same as an
+            accepted case. Compare acquisition channels at the same stage of the funnel. If paid
+            search reports form submissions while another tool reports booked consultations, their
+            costs are not directly comparable.
           </p>
-        </div>
+          <h2>Where a website conversion tool fits</h2>
+          <p>
+            A conversion tool does not replace traffic acquisition. Its job is to create more useful
+            actions from visitors the clinic already paid for or earned organically. Measure its
+            incremental effect using qualified leads, booked consultations and accepted treatment—not
+            upload volume alone.
+          </p>
+        </section>
 
-        <div className="pt-4">
-          <Link href="/compare" className="text-[#C5A038] font-bold text-sm uppercase tracking-widest">
-            See how SmileFlow compares to other smile assessment tools &rarr;
-          </Link>
+        <aside className="editorial-callout">
+          <h2>Methodology</h2>
+          <p>
+            We reviewed publicly accessible 2026 guides from dental marketing providers and retained
+            only ranges we could link directly. These figures are directional and should be replaced
+            by a clinic&apos;s own advertising and booking data whenever available.
+          </p>
+        </aside>
+
+        <div className="editorial-actions">
+          <Link href="/guides/dental-website-lead-generation" className="button button-primary">Read the conversion guide</Link>
+          <Link href="/compare" className="text-link">Compare smile assessment tools →</Link>
         </div>
-      </div>
-    </div>
+      </article>
+    </main>
   );
 }

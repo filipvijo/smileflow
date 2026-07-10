@@ -9,7 +9,7 @@ export default function RoiChart() {
       <title>Cost per lead: Google Ads versus SmileFlow</title>
       <desc>
         A bar chart comparing the cost of acquiring 10 dental patient leads via Google Ads
-        (approximately $850, based on an $50 to $119 average cost per lead) against SmileFlow's
+        (approximately $850, based on an $50 to $119 average cost per lead) against SmileFlow&apos;s
         flat $149 per month unlimited-lead plan.
       </desc>
 

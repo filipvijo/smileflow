@@ -14,7 +14,7 @@
   var base;
   try {
     base = new URL(script.src).origin;
-  } catch (e) {
+  } catch {
     console.error("[SmileFlow] Could not resolve widget origin.");
     return;
   }
